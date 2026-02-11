@@ -1,0 +1,195 @@
+{
+  "dos_attacks": [
+    {
+      "id": "DOS001",
+      "name": "SYN Flood",
+      "description": "High volume of SYN packets without completion",
+      "severity": "HIGH",
+      "conditions": {
+        "protocol": "TCP",
+        "syn_flag_count": {"min": 100},
+        "ack_flag_count": {"max": 5},
+        "flow_duration": {"max": 1000}
+      }
+    },
+    {
+      "id": "DOS002",
+      "name": "UDP Flood",
+      "severity": "HIGH",
+      "conditions": {
+        "protocol": "UDP",
+        "flow_packets_per_sec": {"min": 1000},
+        "total_fwd_packets": {"min": 500}
+      }
+    },
+    {
+      "id": "DOS003",
+      "name": "HTTP Flood (Slowloris)",
+      "severity": "MEDIUM",
+      "conditions": {
+        "protocol": "TCP",
+        "destination_port": 80,
+        "flow_duration": {"min": 30000},
+        "fwd_packet_length_mean": {"max": 100}
+      }
+    }
+  ],
+  "port_scan": [
+    {
+      "id": "SCAN001",
+      "name": "TCP Port Scan",
+      "severity": "MEDIUM",
+      "conditions": {
+        "protocol": "TCP",
+        "syn_flag_count": {"min": 1},
+        "rst_flag_count": {"min": 1},
+        "total_fwd_packets": {"max": 4},
+        "flow_duration": {"max": 500}
+      }
+    }
+  ],
+  "brute_force": [
+    {
+      "id": "BF001",
+      "name": "SSH Brute Force",
+      "severity": "HIGH",
+      "conditions": {
+        "destination_port": 22,
+        "protocol": "TCP",
+        "total_fwd_packets": {"min": 5, "max": 20},
+        "fwd_packet_length_mean": {"min": 50, "max": 300}
+      }
+    },
+    {
+      "id": "BF002",
+      "name": "FTP Brute Force",
+      "severity": "HIGH",
+      "conditions": {
+        "destination_port": 21,
+        "protocol": "TCP",
+        "total_fwd_packets": {"min": 5}
+      }
+    }
+  ],
+  "web_attacks": [
+    {
+      "id": "WEB001",
+      "name": "SQL Injection Attempt",
+      "severity": "CRITICAL",
+      "conditions": {
+        "destination_port": [80, 443, 8080],
+        "protocol": "TCP",
+        "fwd_packet_length_max": {"min": 500},
+        "total_fwd_packets": {"min": 3}
+      }
+    },
+    {
+      "id": "WEB002",
+      "name": "XSS Attempt",
+      "severity": "HIGH",
+      "conditions": {
+        "destination_port": [80, 443],
+        "protocol": "TCP",
+        "fwd_packet_length_mean": {"min": 200}
+      }
+    }
+  ],
+  "botnet": [
+    {
+      "id": "BOT001",
+      "name": "Botnet C2 Communication",
+      "severity": "CRITICAL",
+      "conditions": {
+        "flow_duration": {"min": 10000},
+        "flow_bytes_per_sec": {"min": 100, "max": 5000},
+        "flow_iat_mean": {"min": 5000},
+        "total_fwd_packets": {"min": 10}
+      }
+    }
+  ],
+  "nsl_kdd_rules": {
+    "dos": [
+      {
+        "id": "NSL_DOS001",
+        "name": "NSL-KDD SYN Flood",
+        "severity": "HIGH",
+        "conditions": {
+          "protocol_type": "tcp",
+          "flag": ["S0", "REJ"],
+          "src_bytes": {"max": 100},
+          "count": {"min": 100}
+        }
+      },
+      {
+        "id": "NSL_DOS002",
+        "name": "NSL-KDD Smurf Attack",
+        "severity": "HIGH",
+        "conditions": {
+          "protocol_type": "icmp",
+          "src_bytes": {"min": 500},
+          "dst_bytes": {"min": 0, "max": 10}
+        }
+      },
+      {
+        "id": "NSL_DOS003",
+        "name": "NSL-KDD Neptune Attack",
+        "severity": "HIGH",
+        "conditions": {
+          "protocol_type": "tcp",
+          "flag": "S0",
+          "src_bytes": {"max": 10},
+          "dst_bytes": {"max": 10},
+          "count": {"min": 50}
+        }
+      }
+    ],
+    "probe": [
+      {
+        "id": "NSL_PROBE001",
+        "name": "NSL-KDD Port Sweep",
+        "severity": "MEDIUM",
+        "conditions": {
+          "protocol_type": "tcp",
+          "flag": ["REJ", "RSTO"],
+          "dst_host_srv_count": {"max": 10},
+          "dst_host_same_srv_rate": {"max": 0.2}
+        }
+      },
+      {
+        "id": "NSL_PROBE002",
+        "name": "NSL-KDD Satan Probe",
+        "severity": "MEDIUM",
+        "conditions": {
+          "protocol_type": "tcp",
+          "flag": "RSTR",
+          "count": {"min": 1, "max": 10},
+          "serror_rate": {"min": 0.5}
+        }
+      }
+    ],
+    "r2l": [
+      {
+        "id": "NSL_R2L001",
+        "name": "NSL-KDD Guess Password",
+        "severity": "HIGH",
+        "conditions": {
+          "protocol_type": "tcp",
+          "service": ["ftp", "telnet", "pop_3", "imap4"],
+          "num_failed_logins": {"min": 3}
+        }
+      }
+    ],
+    "u2r": [
+      {
+        "id": "NSL_U2R001",
+        "name": "NSL-KDD Buffer Overflow",
+        "severity": "CRITICAL",
+        "conditions": {
+          "protocol_type": "tcp",
+          "num_root": {"min": 1},
+          "root_shell": 1
+        }
+      }
+    ]
+  }
+}

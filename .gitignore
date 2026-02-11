@@ -1,0 +1,53 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Data files (too large for git)
+data/raw/*
+data/processed/*
+data/adversarial/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/adversarial/.gitkeep
+
+# Model files (too large for git)
+models/tier1/*.pkl
+models/tier2/*.h5
+models/tier2/*.keras
+models/tier3/*.pth
+models/gan/*.pth
+models/preprocessing/*.pkl
+
+# Logs
+logs/*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TensorBoard
+runs/
+
+# Coverage
+htmlcov/
+.coverage
