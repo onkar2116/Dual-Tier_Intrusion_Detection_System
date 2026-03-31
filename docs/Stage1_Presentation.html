@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adversarially Robust IDS - Stage 1 Presentation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', Arial, sans-serif;
+    background: #0f1117;
+    color: #fff;
+  }
+
+  /* ── SLIDE WRAPPER ── */
+  .slide {
+    width: 297mm;
+    min-height: 210mm;
+    background: #fff;
+    page-break-after: always;
+    page-break-inside: avoid;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── COMMON ACCENT BAR ── */
+  .slide::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 8px; height: 100%;
+    background: linear-gradient(180deg, #1a3c8f 0%, #0d9488 100%);
+  }
+
+  /* ── SLIDE HEADER ── */
+  .slide-header {
+    background: linear-gradient(135deg, #0f1f5c 0%, #1a3c8f 60%, #0d9488 100%);
+    padding: 22px 40px 22px 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 72px;
+  }
+  .slide-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+  }
+  .slide-header .badge {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.35);
+    color: #a5f3fc;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* ── SLIDE BODY ── */
+  .slide-body {
+    padding: 24px 44px 20px 52px;
+    flex: 1;
+    background: #fff;
+  }
+
+  /* ── FOOTER ── */
+  .slide-footer {
+    padding: 8px 44px 8px 52px;
+    background: #f1f5f9;
+    border-top: 2px solid #1a3c8f;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  /* ── TITLE SLIDE ── */
+  .title-slide {
+    background: linear-gradient(135deg, #0f1f5c 0%, #1a3c8f 55%, #0d9488 100%);
+    min-height: 210mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 50px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .title-slide::before { display: none; }
+  .title-slide::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    top: -100px; right: -100px;
+  }
+  .ts-tag {
+    background: rgba(13,148,136,0.35);
+    border: 1px solid #0d9488;
+    color: #a5f3fc;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 20px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+  .ts-title {
+    font-size: 38px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .ts-subtitle {
+    font-size: 15px;
+    color: #93c5fd;
+    font-weight: 400;
+    margin-bottom: 40px;
+    max-width: 480px;
+  }
+  .ts-divider {
+    width: 80px; height: 3px;
+    background: linear-gradient(90deg, #0d9488, #60a5fa);
+    border-radius: 2px;
+    margin: 0 auto 36px;
+  }
+  .ts-info {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .ts-info-item {
+    text-align: center;
+  }
+  .ts-info-item .label {
+    font-size: 10px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .ts-info-item .value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+
+  /* ── TYPOGRAPHY ── */
+  h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f1f5c;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a3c8f;
+    margin-bottom: 8px;
+    margin-top: 12px;
+  }
+  p { font-size: 12.5px; color: #374151; line-height: 1.6; margin-bottom: 8px; }
+
+  /* ── BULLET LISTS ── */
+  ul { list-style: none; margin-bottom: 10px; }
+  ul li {
+    font-size: 12.5px;
+    color: #374151;
+    padding: 3px 0 3px 18px;
+    position: relative;
+    line-height: 1.5;
+  }
+  ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: #0d9488;
+    font-size: 11px;
+    top: 4px;
+  }
+
+  /* ── CARDS / BOXES ── */
+  .card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #1a3c8f;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .card.teal  { border-left-color: #0d9488; }
+  .card.red   { border-left-color: #ef4444; }
+  .card.amber { border-left-color: #f59e0b; }
+  .card-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0f1f5c;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── TWO COLUMNS ── */
+  .cols {
+    display: grid;
+    gap: 16px;
+  }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* ── TIER BOXES ── */
+  .tier-box {
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .tier1 { background: #eff6ff; border: 1.5px solid #3b82f6; }
+  .tier2 { background: #f0fdf4; border: 1.5px solid #22c55e; }
+  .tier3 { background: #fdf4ff; border: 1.5px solid #a855f7; }
+  .tier-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .tier1 .tier-label { color: #1d4ed8; }
+  .tier2 .tier-label { color: #15803d; }
+  .tier3 .tier-label { color: #7e22ce; }
+  .tier-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+  }
+  .tier-desc {
+    font-size: 11.5px;
+    color: #475569;
+  }
+  .tier-arrow {
+    text-align: center;
+    font-size: 18px;
+    color: #94a3b8;
+    margin: 2px 0;
+  }
+
+  /* ── STATS ROW ── */
+  .stat-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .stat-box {
+    flex: 1;
+    background: linear-gradient(135deg, #0f1f5c, #1a3c8f);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    color: #fff;
+  }
+  .stat-box .num {
+    font-size: 22px;
+    font-weight: 800;
+    color: #a5f3fc;
+  }
+  .stat-box .lbl {
+    font-size: 10px;
+    color: #cbd5e1;
+    margin-top: 2px;
+  }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 6px;
+  }
+  thead tr { background: linear-gradient(135deg, #0f1f5c, #1a3c8f); }
+  thead th {
+    color: #fff;
+    padding: 9px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11.5px;
+  }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody tr:nth-child(odd)  { background: #fff; }
+  tbody td {
+    padding: 8px 12px;
+    color: #374151;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .best { color: #0d9488; font-weight: 700; }
+
+  /* ── HIGHLIGHT CHIPS ── */
+  .chip {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 10.5px;
+    font-weight: 600;
+    margin: 2px 3px;
+  }
+  .chip-blue  { background: #dbeafe; color: #1d4ed8; }
+  .chip-teal  { background: #ccfbf1; color: #0f766e; }
+  .chip-amber { background: #fef3c7; color: #b45309; }
+  .chip-purple{ background: #ede9fe; color: #6d28d9; }
+
+  /* ── ARCH DIAGRAM ── */
+  .arch-diagram {
+    background: #0f172a;
+    border-radius: 10px;
+    padding: 18px 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 10.5px;
+    color: #94a3b8;
+    line-height: 1.7;
+    margin-top: 4px;
+  }
+  .arch-diagram .c-white  { color: #f1f5f9; }
+  .arch-diagram .c-teal   { color: #2dd4bf; }
+  .arch-diagram .c-blue   { color: #60a5fa; }
+  .arch-diagram .c-green  { color: #4ade80; }
+  .arch-diagram .c-purple { color: #c084fc; }
+  .arch-diagram .c-amber  { color: #fbbf24; }
+  .arch-diagram .c-red    { color: #f87171; }
+
+  /* ── TIMELINE ── */
+  .timeline { margin-top: 6px; }
+  .tl-item {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+  }
+  .tl-badge {
+    min-width: 72px;
+    text-align: center;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tl-minor { background: #dbeafe; color: #1d4ed8; }
+  .tl-major { background: #0f1f5c; color: #fff; }
+  .tl-now   { border: 2px solid #0d9488; background: #ccfbf1; color: #0f766e; }
+  .tl-content { flex: 1; }
+  .tl-content strong { font-size: 12.5px; color: #0f1f5c; }
+  .tl-content p { font-size: 11px; color: #64748b; margin: 0; }
+
+  /* ── TAG ROW ── */
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+
+  /* ── AGENDA ITEMS ── */
+  .agenda-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .agenda-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+  }
+  .agenda-num {
+    width: 28px; height: 28px;
+    min-width: 28px;
+    background: linear-gradient(135deg, #1a3c8f, #0d9488);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 13px;
+  }
+  .agenda-text strong { font-size: 12.5px; color: #0f1f5c; display: block; }
+  .agenda-text span   { font-size: 11px; color: #64748b; }
+
+  /* ── BAR CHART (class distribution) ── */
+  .bar-item { margin-bottom: 8px; }
+  .bar-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: #374151; margin-bottom: 3px; font-weight: 500;
+  }
+  .bar-track {
+    height: 14px;
+    background: #e2e8f0;
+    border-radius: 7px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 7px;
+    background: linear-gradient(90deg, #1a3c8f, #0d9488);
+  }
+
+  /* ── TECH STACK ITEMS ── */
+  .tech-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .tech-name {
+    min-width: 150px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0f1f5c;
+  }
+  .tech-arrow { color: #0d9488; font-size: 13px; }
+  .tech-use   { font-size: 11.5px; color: #475569; }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: #fff; }
+    .slide {
+      width: 297mm;
+      min-height: 210mm;
+      max-height: 210mm;
+      page-break-after: always;
+    }
+  }
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- SLIDE 1: TITLE                                               -->
+<!-- ============================================================ -->
+<div class="slide">
+  <div class="title-slide">
+    <div class="ts-tag">BTech Final Year Project &nbsp;|&nbsp; Stage 1 Presentation</div>
+    <div class="ts-title">Adversarially Robust<br>Intrusion Detection System</div>
+    <div class="ts-subtitle">A Three-Tier Defense Architecture for Network Security Against Adversarial Machine Learning</div>
+    <div class="ts-divider"></div>
+    <div class="ts-info">
+      <div class="ts-info-item">
+        <div class="label">Presented By</div>
+        <div class="value">Onkar Bhagwat</div>
+      </div>
+      <div class="ts-info-item">
+        <div class="label">Internship</div>
+        <div class="value">Marvell Technologies, Hyderabad</div>
+      </div>
+      <div class="ts-info-item">
+        <div class="label">Mentor</div>
+        <div class="value">[Mentor Name]</div>
+      </div>
+      <div class="ts-info-item">
+        <div class="label">Date</div>
+        <div class="value">[Insert Date]</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- SLIDE 2: AGENDA                                              -->
+<!-- ============================================================ -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Agenda</h1>
+    <span class="badge">Stage 1 of 5</span>
+  </div>
+  <div class="slide-body">
+    <div class="agenda-grid">
+      <div class="agenda-item">
+        <div class="agenda-num">1</div>
+        <div class="agenda-text">
+          <strong>The Problem</strong>
+          <span>Limitations of traditional & ML-based IDS</span>
+        </div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-num">2</div>
+        <div class="agenda-text">
+          <strong>Why It Matters</strong>
+          <span>Real-world security implications</span>
+        </div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-num">3</div>
+        <div class="agenda-text">
+          <strong>Our Solution</strong>
+          <span>Three-tier defense-in-depth approach</span>
+        </div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-num">4</div>
+        <div class="agenda-text">
+          <strong>System Architecture</strong>
+          <span>Full pipeline & component design</span>
+        </div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-num">5</div>
+        <div class="agenda-text">
+          <strong>Technology Stack & Dataset</strong>
+          <span>Tools, frameworks, and NSL-KDD</span>
+        </div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-num">6</div>
+        <div class="agenda-text">
+          <strong>Roadmap & Expected Results</strong>
+          <span>5-stage plan and performance targets</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:18px;" class="card teal">
+      <div class="card-title">⏱ Duration</div>
+      <p style="margin:0; font-size:12px; color:#374151;">This presentation covers <strong>Stage 1 — Foundation & Problem Statement</strong>.
+      Estimated time: <strong>15–20 minutes</strong> followed by open discussion.</p>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Adversarially Robust IDS &nbsp;|&nbsp; Onkar Bhagwat</span>
+    <span>Slide 2 / 10</span>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- SLIDE 3: THE PROBLEM                                         -->
+<!-- ============================================================ -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>The Problem</h1>
+    <span class="badge">Problem Statement</span>
+  </div>
+  <div class="slide-body">
+    <div class="cols cols-2">
+      <div>
+        <div class="card red">
+          <div class="card-title">❌ Traditional (Signature-Based) IDS</div>
+          <ul>
+            <li>Pattern matching against known attack signatures</li>
+            <li>Cannot detect <strong>zero-day / unknown attacks</strong></li>
+            <li>Requires constant manual rule updates</li>
+            <li>Easily bypassed with minor attack variations</li>
+          </ul>
+          <div style="background:#fef2f2;border-radius:6px;padding:8px;margin-top:8px;font-size:11px;font-family:monospace;color:#991b1b;">
+            IF (SYN_count &gt; 100 AND ACK &lt; 5)<br>
+            THEN attack = "SYN Flood"<br>
+            <span style="color:#ef4444;">⚠ What if attacker sends 99 SYNs?  →  MISSED!</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card amber">
+          <div class="card-title">⚠ ML-Based IDS — Vulnerable to Adversarial Attacks</div>
+          <ul>
+            <li>Learns patterns → detects unknown attacks ✓</li>
+            <li>Achieves ~95% accuracy on clean data ✓</li>
+            <li style="color:#b45309;"><strong>Fooled by tiny perturbations ✗</strong></li>
+          </ul>
+          <div style="margin-top:10px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;margin-bottom:6px;">
+              <span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:4px;font-weight:700;">Clean</span>
+              <span style="color:#475569;">→ ML Model →</span>
+              <span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:4px;font-weight:700;">✓ Detected (95%)</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;">
+              <span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:4px;font-weight:700;">Adversarial</span>
+              <span style="color:#475569;">→ ML Model →</span>
+              <span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:4px;font-weight:700;">✗ Missed (40%)</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="border-left-color:#0f1f5c;background:#f0f4ff;margin-top:8px;">
+          <div class="card-title" style="color:#0f1f5c;">🎯 Core Problem</div>
+          <p style="margin:0;font-size:12px;">Attackers craft <strong>adversarial perturbations</strong> — tiny invisible changes to network traffic — that cause ML classifiers to misclassify attacks as normal traffic. Existing IDS systems have <strong>no defense</strong> against this.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Adversarially Robust IDS &nbsp;|&nbsp; Onkar Bhagwat</span>
+    <span>Slide 3 / 10</span>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- SLIDE 4: OUR SOLUTION                                        -->
+<!-- ============================================================ -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Our Solution — Three-Tier Defense Architecture</h1>
+    <span class="badge">Defense-in-Depth</span>
+  </div>
+  <div class="slide-body">
+    <div class="cols cols-2">
+      <div>
+        <div class="tier-box tier1">
+          <div class="tier-label">Tier 1</div>
+          <div class="tier-title">Signature-Based Detection</div>
+          <div class="tier-desc">Fast pattern matching against known attack signatures. Database of DoS, Probe, R2L, U2R, brute-force rules.</div>
+          <div style="margin-top:6px;">
+            <span class="chip chip-blue">100% on Known Attacks</span>
+            <span class="chip chip-blue">&lt; 0.5ms/sample</span>
+          </div>
+        </div>
+        <div class="tier-arrow">↓ &nbsp;<span style="font-size:10px;color:#94a3b8;">if no signature match</span></div>
+        <div class="tier-box tier2">
+          <div class="tier-label">Tier 2</div>
+          <div class="tier-title">ML Classification (DNN / CNN / LSTM)</div>
+          <div class="tier-desc">Three deep learning models trained on NSL-KDD to detect unknown & novel attacks across 5 categories.</div>
+          <div style="margin-top:6px;">
+            <span class="chip chip-teal">~95% Clean Accuracy</span>
+            <span class="chip chip-teal">~12ms/sample</span>
+          </div>
+        </div>
+        <div class="tier-arrow">↓ &nbsp;<span style="font-size:10px;color:#94a3b8;">if attack detected</span></div>
+        <div class="tier-box tier3">
+          <div class="tier-label">Tier 3</div>
+          <div class="tier-title">Adversarial Defense</div>
+          <div class="tier-desc">Adversarial training + feature squeezing + ensemble voting to detect and resist adversarial evasion.</div>
+          <div style="margin-top:6px;">
+            <span class="chip chip-purple">88% Robust Accuracy</span>
+            <span class="chip chip-purple">~35ms/sample</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card teal" style="margin-bottom:12px;">
+          <div class="card-title">💡 Key Innovation</div>
+          <p style="margin:0;font-size:12px;">We combine all three layers into a single pipeline where <strong>each tier compensates for the weakness of the previous one</strong>. No prior IDS integrates all three strategies together.</p>
+        </div>
+        <div style="background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:#0f1f5c;margin-bottom:10px;">What Each Tier Handles</div>
+          <table style="font-size:11px;">
+            <thead>
+              <tr>
+                <th style="text-align:left;padding:5px 8px;">Threat Type</th>
+                <th style="text-align:center;padding:5px 8px;">T1</th>
+                <th style="text-align:center;padding:5px 8px;">T2</th>
+                <th style="text-align:center;padding:5px 8px;">T3</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding:5px 8px;">Known Attacks</td><td style="text-align:center;color:#16a34a;font-weight:700;">✓</td><td style="text-align:center;color:#16a34a;font-weight:700;">✓</td><td style="text-align:center;color:#16a34a;font-weight:700;">✓</td></tr>
+              <tr><td style="padding:5px 8px;">Zero-Day Attacks</td><td style="text-align:center;color:#dc2626;font-weight:700;">✗</td><td style="text-align:center;color:#16a34a;font-weight:700;">✓</td><td style="text-align:center;color:#16a34a;font-weight:700;">✓</td></tr>
+              <tr><td style="padding:5px 8px;">Adversarial Evasion</td><td style="text-align:center;color:#dc2626;font-weight:700;">✗</td><td style="text-align:center;color:#dc2626;font-weight:700;">✗</td><td style="text-align:center;color:#16a34a;font-weight:700;">✓</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card" style="margin-top:10px;border-left-color:#0d9488;background:#f0fdf9;">
+          <div class="card-title">Also Includes</div>
+          <ul style="margin:0;">
+            <li><strong>WGAN-GP</strong> — GAN for synthetic attack data generation</li>
+            <li><strong>Alert Manager</strong> — Priority-based alert system</li>
+            <li><strong>Streamlit Dashboard</strong> — Real-time monitoring UI</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Adversarially Robust IDS &nbsp;|&nbsp; Onkar Bhagwat</span>
+    <span>Slide 4 / 10</span>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- SLIDE 5: ARCHITECTURE DIAGRAM                                -->
+<!-- ============================================================ -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>System Architecture</h1>
+    <span class="badge">Full Pipeline</span>
+  </div>
+  <div class="slide-body" style="padding-top:16px;">
+    <div class="arch-diagram">
+<span class="c-white">  DATA SOURCES               PREPROCESSING                 DETECTION PIPELINE</span>
+<span class="c-white">  ─────────────              ─────────────                 ──────────────────</span>
+
+  <span class="c-blue">┌────────────┐</span>             <span class="c-teal">┌──────────────────────┐</span>       <span class="c-blue">┌────────────────────────────┐</span>
+  <span class="c-blue">│  NSL-KDD   │</span>──────────→  <span class="c-teal">│  Data Cleaning       │</span>  ┌──→ <span class="c-blue">│  TIER 1: SIGNATURE         │</span>
+  <span class="c-blue">└────────────┘</span>             <span class="c-teal">│  Label Encoding      │</span>  │    <span class="c-blue">│  Pattern matching          │</span>
+  <span class="c-blue">┌────────────┐</span>             <span class="c-teal">│  One-Hot Encoding    │</span>  │    <span class="c-blue">│  signatures.json database  │</span>
+  <span class="c-blue">│ CICIDS2017 │</span>──────────→  <span class="c-teal">│  StandardScaler      │</span>──┤    <span class="c-blue">│  &lt;0.5ms  |  100% known     │</span>
+  <span class="c-blue">└────────────┘</span>             <span class="c-teal">│  Feature Selection   │</span>  │    <span class="c-blue">└────────────┬───────────────┘</span>
+  <span class="c-blue">┌────────────┐</span>             <span class="c-teal">│  SMOTE Balancing     │</span>  │                 │ (no match)
+  <span class="c-blue">│ Synthetic  │</span>──────────→  <span class="c-teal">└──────────────────────┘</span>  │    <span class="c-green">┌────────────▼───────────────┐</span>
+  <span class="c-blue">└────────────┘</span>                                         └──→ <span class="c-green">│  TIER 2: ML CLASSIFICATION │</span>
+                             <span class="c-amber">GAN MODULE</span>                      <span class="c-green">│  DNN / CNN / LSTM models   │</span>
+  <span class="c-amber">┌────────────────────┐</span>                                      <span class="c-green">│  5-class attack detection  │</span>
+  <span class="c-amber">│  WGAN-GP Generator │</span>  Synthetic attack                  <span class="c-green">│  ~95% acc  |  ~12ms        │</span>
+  <span class="c-amber">│  Generator + Disc. │</span>  traffic for                       <span class="c-green">└────────────┬───────────────┘</span>
+  <span class="c-amber">│  Gradient Penalty  │</span>  augmentation                                  │ (attack found)
+  <span class="c-amber">└────────────────────┘</span>                                      <span class="c-purple">┌────────────▼───────────────┐</span>
+                                                              <span class="c-purple">│  TIER 3: ADVERSARIAL DEF.  │</span>
+  <span class="c-white">EVALUATION</span>                                                   <span class="c-purple">│  Adversarial Training      │</span>
+  <span class="c-white">┌────────────────────┐</span>                                      <span class="c-purple">│  Feature Squeezing         │</span>
+  <span class="c-white">│  Metrics, ROC,     │</span>     Comprehensive                   <span class="c-purple">│  Ensemble Voting           │</span>
+  <span class="c-white">│  Confusion Matrix, │</span>  ←─ evaluation &amp;                   <span class="c-purple">│  88% robust  |  ~35ms      │</span>
+  <span class="c-white">│  Robustness Tests  │</span>     visualization                   <span class="c-purple">└────────────┬───────────────┘</span>
+  <span class="c-white">└────────────────────┘</span>                                                  │
+                                                              <span class="c-red">┌────────────▼───────────────┐</span>    <span class="c-teal">┌───────────────────────┐</span>
+                                                              <span class="c-red">│  ALERT MANAGER             │</span>    <span class="c-teal">│  STREAMLIT DASHBOARD  │</span>
+                                                              <span class="c-red">│  Priority 1-4 scoring      │</span>    <span class="c-teal">│  Real-time Monitor    │</span>
+                                                              <span class="c-red">│  Logging &amp; statistics      │</span>    <span class="c-teal">│  Attack Simulation    │</span>
+                                                              <span class="c-red">└────────────────────────────┘</span>    <span class="c-teal">└───────────────────────┘</span>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Adversarially Robust IDS &nbsp;|&nbsp; Onkar Bhagwat</span>
+    <span>Slide 5 / 10</span>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- SLIDE 6: TECH STACK                                          -->
+<!-- ============================================================ -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Technology Stack</h1>
+    <span class="badge">Frameworks & Tools</span>
+  </div>
+  <div class="slide-body">
+    <div class="cols cols-2">
+      <div>
+        <h2>Core Frameworks</h2>
+        <div class="tech-item">
+          <div class="tech-name">🔷 TensorFlow 2.13+</div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-use">Tier 2 ML models (DNN / CNN / LSTM), Keras training callbacks</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">🔶 PyTorch 2.0+</div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-use">Adversarial attacks, Tier 3 robust model, WGAN-GP generator</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">📊 scikit-learn</div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-use">Preprocessing pipeline, evaluation metrics, feature selection</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">⚖️ imbalanced-learn</div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-use">SMOTE class oversampling for minority attack classes</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">🛡 ART (IBM)</div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-use">Adversarial Robustness Toolbox — C&W, DeepFool attacks</div>
+        </div>
+
+        <h2 style="margin-top:14px;">Visualization & UI</h2>
+        <div class="tech-item">
+          <div class="tech-name">🌐 Streamlit</div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-use">Interactive real-time monitoring dashboard</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">📈 Plotly</div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-use">Interactive charts — ROC, confusion matrix, epsilon curves</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">📉 Matplotlib / Seaborn</div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-use">Static plots — training history, feature importance</div>
+        </div>
+      </div>
+      <div>
+        <h2>Data & Config</h2>
+        <div class="tech-item">
+          <div class="tech-name">🐼 pandas / NumPy</div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-use">Data loading, cleaning, and manipulation</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">⚙️ YAML Config</div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-use">Single source of truth for all parameters</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">🧪 pytest</div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-use">Unit & integration testing for all modules</div>
+        </div>
+
+        <h2 style="margin-top:14px;">Why Two DL Frameworks?</h2>
+        <div class="card" style="border-left-color:#3b82f6;">
+          <div class="card-title" style="color:#1d4ed8;">TensorFlow / Keras</div>
+          <p style="margin:0;font-size:11.5px;color:#374151;">Production-grade, mature callbacks (EarlyStopping, ReduceLR), easy model saving (.h5), ideal for Tier 2 training pipeline.</p>
+        </div>
+        <div class="card teal" style="margin-top:8px;">
+          <div class="card-title">PyTorch</div>
+          <p style="margin:0;font-size:11.5px;color:#374151;">Fine-grained gradient control essential for adversarial attacks (FGSM, PGD) and GAN training. More flexible for research.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Adversarially Robust IDS &nbsp;|&nbsp; Onkar Bhagwat</span>
+    <span>Slide 6 / 10</span>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- SLIDE 7: DATASET                                             -->
+<!-- ============================================================ -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Dataset — NSL-KDD</h1>
+    <span class="badge">Primary Dataset</span>
+  </div>
+  <div class="slide-body">
+    <div class="cols cols-2">
+      <div>
+        <h2>Overview</h2>
+        <p>NSL-KDD is the standard benchmark dataset for IDS research, published by the <strong>Canadian Institute for Cybersecurity (UNB)</strong>. It contains labeled network connection records with 41 features per sample.</p>
+
+        <div class="stat-row" style="margin-top:12px;">
+          <div class="stat-box">
+            <div class="num">125K</div>
+            <div class="lbl">Training Samples</div>
+          </div>
+          <div class="stat-box">
+            <div class="num">41</div>
+            <div class="lbl">Raw Features</div>
+          </div>
+          <div class="stat-box">
+            <div class="num">5</div>
+            <div class="lbl">Attack Classes</div>
+          </div>
+        </div>
+
+        <h2 style="margin-top:16px;">Attack Categories</h2>
+        <div style="background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;padding:12px;">
+          <div class="tech-item" style="border-color:#e2e8f0;">
+            <span class="chip chip-teal">Class 0</span>
+            <span style="font-weight:600;font-size:12px;color:#0f1f5c;">Normal</span>
+            <span style="font-size:11px;color:#64748b;margin-left:4px;">— Legitimate benign traffic</span>
+          </div>
+          <div class="tech-item" style="border-color:#e2e8f0;">
+            <span class="chip chip-blue">Class 1</span>
+            <span style="font-weight:600;font-size:12px;color:#0f1f5c;">DoS</span>
+            <span style="font-size:11px;color:#64748b;margin-left:4px;">— neptune, smurf, back, teardrop</span>
+          </div>
+          <div class="tech-item" style="border-color:#e2e8f0;">
+            <span class="chip chip-amber">Class 2</span>
+            <span style="font-weight:600;font-size:12px;color:#0f1f5c;">Probe</span>
+            <span style="font-size:11px;color:#64748b;margin-left:4px;">— portsweep, ipsweep, nmap, satan</span>
+          </div>
+          <div class="tech-item" style="border-color:#e2e8f0;">
+            <span class="chip chip-purple">Class 3</span>
+            <span style="font-weight:600;font-size:12px;color:#0f1f5c;">R2L</span>
+            <span style="font-size:11px;color:#64748b;margin-left:4px;">— guess_passwd, ftp_write, imap</span>
+          </div>
+          <div class="tech-item" style="border-color:transparent;">
+            <span class="chip" style="background:#fee2e2;color:#991b1b;">Class 4</span>
+            <span style="font-weight:600;font-size:12px;color:#0f1f5c;">U2R</span>
+            <span style="font-size:11px;color:#64748b;margin-left:4px;">— buffer_overflow, rootkit, loadmodule</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h2>Class Distribution Challenge</h2>
+        <div class="bar-item">
+          <div class="bar-label"><span>Normal — 67,343</span><span>53.4%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:53.4%;background:linear-gradient(90deg,#0d9488,#14b8a6);"></div></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label"><span>DoS — 45,927</span><span>36.5%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:36.5%;background:linear-gradient(90deg,#1a3c8f,#3b82f6);"></div></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label"><span>Probe — 11,656</span><span>9.3%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:9.3%;background:linear-gradient(90deg,#92400e,#f59e0b);"></div></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label"><span>R2L — 995</span><span>0.8%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0.8%;background:linear-gradient(90deg,#6d28d9,#a855f7);"></div></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label"><span>U2R — 52</span><span>0.04%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0.2%;background:linear-gradient(90deg,#991b1b,#ef4444);"></div></div>
+        </div>
+
+        <div class="card red" style="margin-top:14px;">
+          <div class="card-title">⚠ Key Challenge — Severe Imbalance</div>
+          <p style="margin:0;font-size:11.5px;">U2R class has only <strong>52 samples</strong> out of 125K. A naive model ignoring U2R gets 99% accuracy — but detects <strong>zero</strong> user-to-root attacks!</p>
+        </div>
+        <div class="card teal" style="margin-top:8px;">
+          <div class="card-title">✅ Our Fix</div>
+          <p style="margin:0;font-size:11.5px;"><strong>SMOTE</strong> oversampling + <strong>WGAN-GP</strong> synthetic generation equalizes all classes before training, forcing the model to learn all attack types equally.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Adversarially Robust IDS &nbsp;|&nbsp; Onkar Bhagwat</span>
+    <span>Slide 7 / 10</span>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- SLIDE 8: ADVERSARIAL ATTACKS                                 -->
+<!-- ============================================================ -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Adversarial Attacks We Implement</h1>
+    <span class="badge">Stage 3 Preview</span>
+  </div>
+  <div class="slide-body">
+    <p style="margin-bottom:14px;">We implement <strong>4 adversarial attack methods</strong> to stress-test the system and validate our Tier 3 defense. Each adds carefully crafted noise to trick the ML classifier.</p>
+    <div class="cols cols-2">
+      <div>
+        <div class="card" style="border-left-color:#3b82f6;">
+          <div class="card-title" style="color:#1d4ed8;">⚡ FGSM — Fast Gradient Sign Method</div>
+          <p style="margin:0 0 4px;font-size:11.5px;">Single-step gradient attack. Fast but moderate strength.</p>
+          <div style="background:#eff6ff;border-radius:4px;padding:6px;font-family:monospace;font-size:11px;color:#1d4ed8;">
+            x_adv = x + ε · sign(∇<sub>x</sub> Loss)
+          </div>
+          <div style="margin-top:6px;"><span class="chip chip-blue">1 step</span><span class="chip chip-blue">Fast</span><span class="chip chip-blue">ε = 0.1</span></div>
+        </div>
+        <div class="card" style="border-left-color:#22c55e;margin-top:10px;">
+          <div class="card-title" style="color:#15803d;">🔁 PGD — Projected Gradient Descent</div>
+          <p style="margin:0 0 4px;font-size:11.5px;">Iterative FGSM with projection. Strongest white-box attack.</p>
+          <div style="background:#f0fdf4;border-radius:4px;padding:6px;font-family:monospace;font-size:11px;color:#15803d;">
+            x_adv = Π<sub>ε</sub>(x_adv + α · sign(∇ Loss))
+          </div>
+          <div style="margin-top:6px;"><span class="chip chip-teal">40 steps</span><span class="chip chip-teal">Strong</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="border-left-color:#f59e0b;">
+          <div class="card-title" style="color:#b45309;">🎯 C&W — Carlini & Wagner L2</div>
+          <p style="margin:0 0 4px;font-size:11.5px;">Optimization-based. Finds minimum perturbation needed to misclassify.</p>
+          <div style="background:#fffbeb;border-radius:4px;padding:6px;font-family:monospace;font-size:11px;color:#92400e;">
+            min ||δ||₂ &nbsp;s.t.&nbsp; f(x+δ) ≠ true_class
+          </div>
+          <div style="margin-top:6px;"><span class="chip chip-amber">100 steps</span><span class="chip chip-amber">Strongest</span></div>
+        </div>
+        <div class="card" style="border-left-color:#a855f7;margin-top:10px;">
+          <div class="card-title" style="color:#7e22ce;">🌀 DeepFool</div>
+          <p style="margin:0 0 4px;font-size:11.5px;">Finds the closest decision boundary with minimal perturbation.</p>
+          <div style="margin-top:6px;"><span class="chip chip-purple">50 steps</span><span class="chip chip-purple">Efficient</span></div>
+        </div>
+        <div class="card" style="border-left-color:#ef4444;margin-top:10px;background:#fff5f5;">
+          <div class="card-title" style="color:#dc2626;">📉 Impact on Undefended ML-IDS</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+            <div style="text-align:center;flex:1;">
+              <div style="font-size:18px;font-weight:800;color:#0d9488;">95%</div>
+              <div style="font-size:10px;color:#64748b;">Clean</div>
+            </div>
+            <div style="text-align:center;flex:1;">
+              <div style="font-size:18px;font-weight:800;color:#f59e0b;">60%</div>
+              <div style="font-size:10px;color:#64748b;">Under FGSM</div>
+            </div>
+            <div style="text-align:center;flex:1;">
+              <div style="font-size:18px;font-weight:800;color:#ef4444;">40%</div>
+              <div style="font-size:10px;color:#64748b;">Under PGD</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Adversarially Robust IDS &nbsp;|&nbsp; Onkar Bhagwat</span>
+    <span>Slide 8 / 10</span>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- SLIDE 9: EXPECTED RESULTS & ROADMAP                          -->
+<!-- ============================================================ -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Expected Results & Development Roadmap</h1>
+    <span class="badge">Timeline & Targets</span>
+  </div>
+  <div class="slide-body">
+    <div class="cols cols-2">
+      <div>
+        <h2>Performance Targets</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Sig Only</th>
+              <th>ML Only</th>
+              <th>Our System</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Clean Accuracy</td>
+              <td>85%</td>
+              <td>95%</td>
+              <td class="best">95%</td>
+            </tr>
+            <tr>
+              <td>Robust Accuracy</td>
+              <td>—</td>
+              <td style="color:#ef4444;font-weight:600;">40%</td>
+              <td class="best">88%</td>
+            </tr>
+            <tr>
+              <td>False Positive Rate</td>
+              <td>1%</td>
+              <td>6%</td>
+              <td class="best">3.5%</td>
+            </tr>
+            <tr>
+              <td>Unknown Attacks</td>
+              <td style="color:#ef4444;font-weight:600;">0%</td>
+              <td>95%</td>
+              <td class="best">95%</td>
+            </tr>
+            <tr>
+              <td>Detection Speed</td>
+              <td>0.3ms</td>
+              <td>12ms</td>
+              <td class="best">≤35ms</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="card teal" style="margin-top:12px;">
+          <div class="card-title">🏆 Key Win</div>
+          <p style="margin:0;font-size:11.5px;">We improve robust accuracy from <strong style="color:#ef4444;">40%</strong> to <strong style="color:#0d9488;">88%</strong> — a <strong>+48% gain</strong> while maintaining clean accuracy at 95%.</p>
+        </div>
+      </div>
+      <div>
+        <h2>5-Stage Development Plan</h2>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-badge tl-now">Stage 1<br>MINOR</div>
+            <div class="tl-content">
+              <strong>Problem Statement & Architecture ← NOW</strong>
+              <p>Literature review, system design, tech stack, planning</p>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-badge tl-major">Stage 2<br>MAJOR</div>
+            <div class="tl-content">
+              <strong>Preprocessing + Tier 1 + Tier 2</strong>
+              <p>Full data pipeline, signature detection, DNN/CNN/LSTM training, baseline evaluation</p>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-badge tl-minor">Stage 3<br>MINOR</div>
+            <div class="tl-content">
+              <strong>Adversarial Attack Implementations</strong>
+              <p>FGSM, PGD, C&W, DeepFool — robustness vulnerability analysis</p>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-badge tl-minor">Stage 4<br>MINOR</div>
+            <div class="tl-content">
+              <strong>GAN Module — WGAN-GP</strong>
+              <p>Synthetic attack data generation, data augmentation for rare classes</p>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-badge tl-major">Stage 5<br>MAJOR</div>
+            <div class="tl-content">
+              <strong>Tier 3 + Integration + Final Demo</strong>
+              <p>Adversarial training, ensemble defense, full pipeline, dashboard, evaluation report</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Adversarially Robust IDS &nbsp;|&nbsp; Onkar Bhagwat</span>
+    <span>Slide 9 / 10</span>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- SLIDE 10: THANK YOU                                          -->
+<!-- ============================================================ -->
+<div class="slide">
+  <div class="title-slide" style="justify-content:space-between;padding:50px 70px;">
+    <div style="text-align:center;width:100%;">
+      <div class="ts-tag">Stage 1 Complete</div>
+      <div class="ts-title" style="font-size:34px;">Thank You!</div>
+      <div class="ts-subtitle">Open for Questions & Feedback</div>
+      <div class="ts-divider"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;max-width:700px;">
+      <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:20px;">
+        <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Next Meeting — Stage 2 (Major)</div>
+        <ul style="list-style:none;margin:0;">
+          <li style="font-size:12px;color:#e2e8f0;padding:3px 0;padding-left:16px;position:relative;">
+            <span style="position:absolute;left:0;color:#0d9488;">✓</span> Complete preprocessing pipeline
+          </li>
+          <li style="font-size:12px;color:#e2e8f0;padding:3px 0;padding-left:16px;position:relative;">
+            <span style="position:absolute;left:0;color:#0d9488;">✓</span> Tier 1 signature detection live
+          </li>
+          <li style="font-size:12px;color:#e2e8f0;padding:3px 0;padding-left:16px;position:relative;">
+            <span style="position:absolute;left:0;color:#0d9488;">✓</span> Trained DNN / CNN / LSTM models
+          </li>
+          <li style="font-size:12px;color:#e2e8f0;padding:3px 0;padding-left:16px;position:relative;">
+            <span style="position:absolute;left:0;color:#0d9488;">✓</span> Baseline evaluation metrics
+          </li>
+          <li style="font-size:12px;color:#e2e8f0;padding:3px 0;padding-left:16px;position:relative;">
+            <span style="position:absolute;left:0;color:#0d9488;">✓</span> Live detection demo
+          </li>
+        </ul>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:20px;">
+        <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Contact</div>
+        <div style="font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Onkar Bhagwat</div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:4px;">BTech Final Year</div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:14px;">Marvell Technologies, Hyderabad</div>
+        <div style="font-size:11.5px;color:#7dd3fc;">📧 [your-email@email.com]</div>
+        <div style="font-size:11.5px;color:#7dd3fc;margin-top:4px;">💼 [github.com/username]</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

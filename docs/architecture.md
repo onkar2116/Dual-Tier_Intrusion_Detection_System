@@ -1,9 +1,7 @@
 # Architecture Documentation
 
 This document describes the system architecture, component design, data flow, and implementation details of the Adversarially Robust Intrusion Detection System.
-
 ---
-
 ## Table of Contents
 
 1. [High-Level System Diagram](#1-high-level-system-diagram)
@@ -32,7 +30,7 @@ This document describes the system architecture, component design, data flow, an
 |   |   DATA SOURCES     |     |          DETECTION PIPELINE             |   |
 |   |                    |     |                                         |   |
 |   |  NSL-KDD Dataset   |     |   +----------+  +--------+  +--------+ |   |
-|   |  CICIDS2017 Dataset +---->+   | TIER 1   |  | TIER 2 |  | TIER 3 | |   |
+|   |  CICIDS2017 Dataset+---->+   TIER 1   |  | TIER 2 |  | TIER 3 | |   |
 |   |  Synthetic Data    |     |   | Signature|->| ML     |->| Advers.| |   |
 |   |  Live Traffic      |     |   | Matching |  | Models |  | Defense| |   |
 |   +--------------------+     |   +----------+  +--------+  +--------+ |   |
@@ -300,7 +298,7 @@ DNN Architecture:                   CNN Architecture:
 +------------------------+         | Conv1D(256, k=3) + ReLU|
 | Dense(32) + ReLU       |         | BatchNorm               |
 +------------------------+         +------------------------+
-| Dense(n_classes)        |         | Flatten                |
+| Dense(n_classes)       |         | Flatten                |
 | Softmax                |         | Dense(128) + Dropout   |
 +------------------------+         | Dense(64) + ReLU       |
                                    | Dense(n_classes)       |
@@ -392,18 +390,18 @@ Detect adversarial evasion attempts and provide robust classification even when 
 |                                                                  |
 |   Strategy 2: INPUT TRANSFORMATION (Feature Squeezing)          |
 |   +----------------------------------------------------------+  |
-|   | At detection time:                                        |  |
+|   | At detection time:                                       |  |
 |   |   1. Get prediction on original input     --> pred_A     |  |
 |   |   2. Reduce bit depth (16 levels)                        |  |
 |   |   3. Get prediction on squeezed input     --> pred_B     |  |
-|   |   4. Compute L1 distance(pred_A, pred_B)                |  |
+|   |   4. Compute L1 distance(pred_A, pred_B)                 |  |
 |   |   5. If distance > threshold (0.1):                      |  |
 |   |        FLAG AS ADVERSARIAL                               |  |
 |   +----------------------------------------------------------+  |
-|                                                                  |
+|                                                                 |
 |   Strategy 3: ENSEMBLE VOTING                                   |
 |   +----------------------------------------------------------+  |
-|   | At detection time:                                        |  |
+|   | At detection time:                                       |  |
 |   |   1. Model_1 predicts probabilities                      |  |
 |   |   2. Model_2 predicts probabilities                      |  |
 |   |   3. Model_N predicts probabilities                      |  |
@@ -412,7 +410,7 @@ Detect adversarial evasion attempts and provide robust classification even when 
 |   |   6. Agreement = fraction of models agreeing             |  |
 |   |   Low agreement --> possible adversarial input           |  |
 |   +----------------------------------------------------------+  |
-|                                                                  |
+|                                                                 |
 +================================================================+
 ```
 

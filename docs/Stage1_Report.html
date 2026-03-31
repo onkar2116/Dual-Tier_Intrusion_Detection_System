@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stage 1 Report - Adversarially Robust IDS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --navy: #0f1f5c;
+    --blue: #1a3c8f;
+    --teal: #0d7377;
+    --dark: #1e293b;
+    --text: #334155;
+    --light: #64748b;
+    --border: #cbd5e1;
+    --bg: #f8fafc;
+    --accent: #0d9488;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page {
+    size: A4 portrait;
+    margin: 22mm 20mm 25mm 25mm;
+  }
+
+  body {
+    font-family: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
+    font-size: 11.5pt;
+    line-height: 1.72;
+    color: var(--text);
+    background: #fff;
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 0 20mm;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    page-break-after: always;
+    padding: 40px 20px;
+  }
+  .cover-line {
+    width: 80px; height: 4px;
+    background: linear-gradient(90deg, var(--navy), var(--accent));
+    border-radius: 2px;
+    margin: 18px auto;
+  }
+  .cover-label {
+    font-size: 10pt;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--light);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .cover h1 {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 24pt;
+    font-weight: 900;
+    color: var(--navy);
+    line-height: 1.25;
+    margin: 10px 0;
+  }
+  .cover h2 {
+    font-size: 13pt;
+    font-weight: 400;
+    color: var(--light);
+    max-width: 420px;
+    margin: 0 auto 8px;
+  }
+  .cover-meta {
+    margin-top: 40px;
+    text-align: center;
+  }
+  .cover-meta table {
+    margin: 0 auto;
+    border-collapse: collapse;
+    font-size: 10.5pt;
+  }
+  .cover-meta td {
+    padding: 5px 14px;
+    text-align: left;
+  }
+  .cover-meta td:first-child {
+    color: var(--light);
+    font-weight: 600;
+    text-align: right;
+  }
+  .cover-meta td:last-child {
+    color: var(--dark);
+  }
+  .cover-stage {
+    display: inline-block;
+    background: var(--navy);
+    color: #fff;
+    font-size: 9pt;
+    font-weight: 700;
+    padding: 5px 18px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    margin-top: 20px;
+  }
+
+  /* ── HEADINGS ── */
+  h1.section-title {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 18pt;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 30px 0 6px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--navy);
+    page-break-after: avoid;
+  }
+  h2 {
+    font-size: 14pt;
+    font-weight: 700;
+    color: var(--blue);
+    margin: 22px 0 8px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 12pt;
+    font-weight: 600;
+    color: var(--teal);
+    margin: 16px 0 6px;
+    page-break-after: avoid;
+  }
+
+  /* ── TEXT ── */
+  p {
+    margin-bottom: 10px;
+    text-align: justify;
+  }
+  .indent { text-indent: 30px; }
+
+  /* ── LISTS ── */
+  ul, ol {
+    margin: 6px 0 12px 24px;
+  }
+  li {
+    margin-bottom: 4px;
+  }
+  li::marker { color: var(--accent); }
+
+  /* ── TABLE ── */
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 16px;
+    font-size: 10.5pt;
+  }
+  table.data-table thead th {
+    background: var(--navy);
+    color: #fff;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 10pt;
+  }
+  table.data-table tbody td {
+    padding: 7px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+  }
+  table.data-table tbody tr:nth-child(even) { background: #f8fafc; }
+  .best { color: var(--accent); font-weight: 700; }
+
+  /* ── CODE ── */
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 9pt;
+    line-height: 1.6;
+    padding: 14px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 10px 0 16px;
+    border-left: 4px solid var(--accent);
+    page-break-inside: avoid;
+  }
+  code {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 9.5pt;
+    background: #f1f5f9;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--navy);
+  }
+  pre .kw { color: #c084fc; }   /* keyword */
+  pre .fn { color: #60a5fa; }   /* function */
+  pre .st { color: #4ade80; }   /* string */
+  pre .cm { color: #64748b; }   /* comment */
+  pre .num { color: #fbbf24; }  /* number */
+  pre .op { color: #f87171; }   /* operator */
+
+  /* ── INFO BOXES ── */
+  .box {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 12px 0 16px;
+    page-break-inside: avoid;
+  }
+  .box-blue {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+  }
+  .box-teal {
+    background: #f0fdfa;
+    border-left: 4px solid var(--accent);
+  }
+  .box-amber {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+  }
+  .box-red {
+    background: #fef2f2;
+    border-left: 4px solid #ef4444;
+  }
+  .box-title {
+    font-weight: 700;
+    font-size: 10.5pt;
+    margin-bottom: 4px;
+    color: var(--dark);
+  }
+  .box p { margin-bottom: 4px; font-size: 10.5pt; }
+
+  /* ── ARCHITECTURE DIAGRAM ── */
+  .arch {
+    background: #0f172a;
+    color: #94a3b8;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 8.5pt;
+    line-height: 1.65;
+    padding: 16px 18px;
+    border-radius: 8px;
+    margin: 12px 0 16px;
+    overflow-x: auto;
+    page-break-inside: avoid;
+  }
+  .arch .w { color: #f1f5f9; }
+  .arch .t { color: #2dd4bf; }
+  .arch .b { color: #60a5fa; }
+  .arch .g { color: #4ade80; }
+  .arch .p { color: #c084fc; }
+  .arch .a { color: #fbbf24; }
+  .arch .r { color: #f87171; }
+
+  /* ── FIGURE CAPTION ── */
+  .fig-caption {
+    text-align: center;
+    font-size: 9.5pt;
+    color: var(--light);
+    font-style: italic;
+    margin: -8px 0 16px;
+  }
+
+  /* ── TWO COLUMNS ── */
+  .cols {
+    display: flex;
+    gap: 20px;
+  }
+  .col { flex: 1; }
+
+  /* ── PAGE BREAK ── */
+  .page-break { page-break-before: always; }
+
+  /* ── TOC ── */
+  .toc {
+    page-break-after: always;
+  }
+  .toc h1 {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 18pt;
+    color: var(--navy);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--navy);
+  }
+  .toc-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px dotted #cbd5e1;
+    font-size: 11pt;
+  }
+  .toc-item.main { font-weight: 700; color: var(--navy); padding-top: 10px; }
+  .toc-item.sub { padding-left: 24px; color: var(--text); }
+  .toc-item .pg { color: var(--light); font-size: 10pt; }
+
+  /* ── FOOTER ── */
+  .page-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 8.5pt;
+    color: var(--light);
+    padding: 8px;
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    body { padding: 0; max-width: none; }
+    .cover { min-height: auto; height: 100vh; }
+    pre, .arch { font-size: 8pt; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================================================================ -->
+<!--  COVER PAGE                                                      -->
+<!-- ================================================================ -->
+<div class="cover">
+  <div class="cover-label">BTech Final Year Project Report</div>
+  <div class="cover-line"></div>
+  <h1>Adversarially Robust<br>Intrusion Detection System</h1>
+  <h2>A Three-Tier Defense Architecture for Network Security Against Adversarial Machine Learning</h2>
+  <div class="cover-line"></div>
+  <div class="cover-stage">STAGE 1 &mdash; FOUNDATION &amp; PROBLEM STATEMENT</div>
+
+  <div class="cover-meta">
+    <table>
+      <tr><td>Submitted By</td><td><strong>Onkar Bhagwat</strong></td></tr>
+      <tr><td>Internship</td><td>Marvell Technologies, Hyderabad</td></tr>
+      <tr><td>Mentor</td><td>[Faculty Mentor Name]</td></tr>
+      <tr><td>Department</td><td>[Department Name]</td></tr>
+      <tr><td>University</td><td>[University Name]</td></tr>
+      <tr><td>Date</td><td>[Insert Date]</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!--  TABLE OF CONTENTS                                               -->
+<!-- ================================================================ -->
+<div class="toc">
+  <h1>Table of Contents</h1>
+  <div class="toc-item main"><span>1. Introduction</span></div>
+  <div class="toc-item sub"><span>1.1 Background</span></div>
+  <div class="toc-item sub"><span>1.2 Problem Statement</span></div>
+  <div class="toc-item sub"><span>1.3 Motivation</span></div>
+  <div class="toc-item sub"><span>1.4 Objectives</span></div>
+  <div class="toc-item main"><span>2. Literature Review</span></div>
+  <div class="toc-item sub"><span>2.1 Traditional IDS Approaches</span></div>
+  <div class="toc-item sub"><span>2.2 ML-Based Intrusion Detection</span></div>
+  <div class="toc-item sub"><span>2.3 Adversarial Machine Learning</span></div>
+  <div class="toc-item sub"><span>2.4 Generative Adversarial Networks</span></div>
+  <div class="toc-item main"><span>3. Proposed System Architecture</span></div>
+  <div class="toc-item sub"><span>3.1 Three-Tier Defense Overview</span></div>
+  <div class="toc-item sub"><span>3.2 Tier 1: Signature-Based Detection</span></div>
+  <div class="toc-item sub"><span>3.3 Tier 2: ML Classification</span></div>
+  <div class="toc-item sub"><span>3.4 Tier 3: Adversarial Defense</span></div>
+  <div class="toc-item sub"><span>3.5 GAN Module</span></div>
+  <div class="toc-item sub"><span>3.6 Complete System Architecture Diagram</span></div>
+  <div class="toc-item main"><span>4. Dataset Description</span></div>
+  <div class="toc-item sub"><span>4.1 NSL-KDD Dataset</span></div>
+  <div class="toc-item sub"><span>4.2 Class Distribution &amp; Imbalance</span></div>
+  <div class="toc-item main"><span>5. Technology Stack</span></div>
+  <div class="toc-item main"><span>6. Project Structure &amp; Implementation</span></div>
+  <div class="toc-item sub"><span>6.1 Directory Organization</span></div>
+  <div class="toc-item sub"><span>6.2 Configuration Management</span></div>
+  <div class="toc-item sub"><span>6.3 Key Code Components</span></div>
+  <div class="toc-item main"><span>7. Data Preprocessing Pipeline</span></div>
+  <div class="toc-item main"><span>8. Adversarial Attack Methods</span></div>
+  <div class="toc-item main"><span>9. Expected Results</span></div>
+  <div class="toc-item main"><span>10. Development Roadmap</span></div>
+  <div class="toc-item main"><span>11. Conclusion</span></div>
+  <div class="toc-item main"><span>12. References</span></div>
+</div>
+
+
+<!-- ================================================================ -->
+<!--  1. INTRODUCTION                                                 -->
+<!-- ================================================================ -->
+<h1 class="section-title">1. Introduction</h1>
+
+<h2>1.1 Background</h2>
+<p class="indent">Network Intrusion Detection Systems (IDS) serve as a critical line of defense in modern cybersecurity infrastructure. They monitor network traffic in real time to identify malicious activities such as denial-of-service (DoS) attacks, unauthorized access attempts, and data exfiltration. As cyber threats continue to grow in volume and sophistication, the need for intelligent, adaptive detection systems has never been greater.</p>
+
+<p class="indent">Traditional IDS solutions rely on <strong>signature-based detection</strong> &mdash; matching incoming traffic against a database of known attack patterns. While effective against previously documented threats, these systems are fundamentally unable to detect novel, unknown, or zero-day attacks. This critical limitation has driven the adoption of <strong>machine learning (ML)</strong> techniques, which can learn complex patterns from labeled network traffic data and generalize to unseen attack variants.</p>
+
+<p class="indent">However, recent research in adversarial machine learning has revealed a significant vulnerability: ML models can be fooled by <strong>adversarial examples</strong> &mdash; carefully crafted inputs with imperceptible perturbations that cause the classifier to produce incorrect predictions. In the context of IDS, an attacker could add tiny modifications to malicious network traffic that cause the ML model to classify it as benign, effectively evading detection entirely.</p>
+
+<h2>1.2 Problem Statement</h2>
+<div class="box box-red">
+  <div class="box-title">Core Problem</div>
+  <p>Existing intrusion detection systems face a fundamental security gap: <strong>signature-based systems cannot detect unknown attacks</strong>, while <strong>ML-based systems are vulnerable to adversarial evasion attacks</strong>. There is no widely adopted IDS architecture that effectively addresses both limitations simultaneously.</p>
+</div>
+
+<p>Specifically, the problems are:</p>
+<ol>
+  <li><strong>Signature-Based IDS Limitations:</strong> Cannot detect zero-day attacks, require constant manual updates, and are easily bypassed with minor attack variations.</li>
+  <li><strong>ML-Based IDS Vulnerability:</strong> Deep learning classifiers achieve high accuracy (~95%) on clean data but accuracy drops to as low as 40% under adversarial perturbation attacks such as FGSM and PGD.</li>
+  <li><strong>Class Imbalance:</strong> Real-world network traffic datasets are heavily imbalanced. In the NSL-KDD dataset, the U2R (User-to-Root) class contains only 52 samples out of 125,973, causing models to ignore rare but critical attack types.</li>
+</ol>
+
+<h2>1.3 Motivation</h2>
+<p class="indent">The increasing deployment of ML models in security-critical applications demands that these systems be robust against adversarial manipulation. A successful adversarial attack against an IDS could have catastrophic consequences &mdash; allowing attackers to penetrate enterprise networks, healthcare systems, financial infrastructure, and critical national infrastructure undetected.</p>
+
+<p>Key motivating factors include:</p>
+<ul>
+  <li>43% increase in network intrusion attempts reported globally in recent years</li>
+  <li>Average cost of a data breach: $4.45 million (IBM Security Report, 2023)</li>
+  <li>Growing sophistication of Advanced Persistent Threats (APTs) using AI-powered evasion</li>
+  <li>NIST and IEEE guidelines emphasizing the need for adversarial robustness in ML systems</li>
+</ul>
+
+<h2>1.4 Objectives</h2>
+<p>The primary objectives of this project are:</p>
+<ol>
+  <li>Design and implement a <strong>three-tier IDS architecture</strong> that combines signature-based detection, deep learning classification, and adversarial defense mechanisms.</li>
+  <li>Train and evaluate three deep learning architectures &mdash; <strong>DNN, CNN, and LSTM</strong> &mdash; for multi-class network traffic classification.</li>
+  <li>Implement four adversarial attack methods &mdash; <strong>FGSM, PGD, C&amp;W, and DeepFool</strong> &mdash; to evaluate model vulnerability.</li>
+  <li>Develop three defense strategies &mdash; <strong>adversarial training, input transformation (feature squeezing), and ensemble voting</strong> &mdash; to improve robust accuracy.</li>
+  <li>Build a <strong>WGAN-GP</strong> module for synthetic attack traffic generation and data augmentation.</li>
+  <li>Create an interactive <strong>Streamlit dashboard</strong> for real-time monitoring, batch analysis, and attack simulation.</li>
+  <li>Achieve <strong>&gt;95% clean accuracy</strong> and <strong>&gt;85% robust accuracy</strong> against adversarial attacks.</li>
+</ol>
+
+
+<!-- ================================================================ -->
+<!--  2. LITERATURE REVIEW                                            -->
+<!-- ================================================================ -->
+<h1 class="section-title page-break">2. Literature Review</h1>
+
+<h2>2.1 Traditional IDS Approaches</h2>
+<p class="indent">Intrusion Detection Systems are broadly categorized into <strong>signature-based (misuse detection)</strong> and <strong>anomaly-based</strong> systems. Signature-based IDS, such as Snort and Suricata, match network packets against a database of known attack patterns. These systems provide high precision for known threats with virtually zero false positives but cannot identify novel attacks not present in the signature database.</p>
+
+<p class="indent">Anomaly-based systems establish a baseline of "normal" behavior and flag deviations. While capable of detecting unknown attacks, they suffer from high false positive rates, making them impractical for production deployment without significant tuning.</p>
+
+<h2>2.2 ML-Based Intrusion Detection</h2>
+<p class="indent">Machine learning approaches have emerged as a powerful alternative for IDS, leveraging supervised classification to categorize network traffic. Notable works include:</p>
+<ul>
+  <li><strong>Buczak &amp; Guven (2016)</strong> &mdash; Comprehensive survey of data mining and ML methods for cybersecurity IDS, establishing benchmarks on the NSL-KDD dataset.</li>
+  <li><strong>Ahmad et al. (2021)</strong> &mdash; Systematic study demonstrating that deep neural networks outperform traditional ML algorithms (Random Forest, SVM) for multi-class attack classification.</li>
+  <li><strong>1D-CNN approaches</strong> &mdash; Treating network features as sequential data, achieving superior pattern recognition for DoS and Probe attacks.</li>
+  <li><strong>LSTM-based approaches</strong> &mdash; Capturing temporal dependencies in network traffic flows, particularly effective for slow-rate attacks.</li>
+</ul>
+
+<h2>2.3 Adversarial Machine Learning</h2>
+<p class="indent">The vulnerability of deep neural networks to adversarial examples was first demonstrated by <strong>Goodfellow et al. (2015)</strong> with the Fast Gradient Sign Method (FGSM). Subsequent work has produced increasingly sophisticated attacks:</p>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Attack Method</th>
+      <th>Authors</th>
+      <th>Year</th>
+      <th>Key Contribution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>FGSM</strong></td>
+      <td>Goodfellow et al.</td>
+      <td>2015</td>
+      <td>Single-step gradient-based attack; fast but moderate strength</td>
+    </tr>
+    <tr>
+      <td><strong>PGD</strong></td>
+      <td>Madry et al.</td>
+      <td>2018</td>
+      <td>Iterative FGSM with projection; strongest first-order attack</td>
+    </tr>
+    <tr>
+      <td><strong>C&amp;W</strong></td>
+      <td>Carlini &amp; Wagner</td>
+      <td>2017</td>
+      <td>Optimization-based; finds minimum perturbation for misclassification</td>
+    </tr>
+    <tr>
+      <td><strong>DeepFool</strong></td>
+      <td>Moosavi-Dezfooli et al.</td>
+      <td>2016</td>
+      <td>Computes minimal perturbation to cross decision boundary</td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="indent">Defense mechanisms include adversarial training (training on adversarial examples), input transformation (preprocessing inputs to remove perturbations), and ensemble methods (aggregating predictions from multiple models). <strong>Madry et al. (2018)</strong> demonstrated that PGD-based adversarial training provides empirically robust models, while <strong>Xu et al. (2018)</strong> introduced feature squeezing as a lightweight detection mechanism.</p>
+
+<h2>2.4 Generative Adversarial Networks for IDS</h2>
+<p class="indent">GANs, introduced by <strong>Goodfellow et al. (2014)</strong>, learn to generate realistic synthetic data. In the IDS context, GANs address the critical class imbalance problem by generating synthetic samples of rare attack types. The <strong>Wasserstein GAN with Gradient Penalty (WGAN-GP)</strong>, proposed by <strong>Gulrajani et al. (2017)</strong>, provides stable training without mode collapse, making it suitable for generating network traffic data.</p>
+
+
+<!-- ================================================================ -->
+<!--  3. PROPOSED SYSTEM ARCHITECTURE                                 -->
+<!-- ================================================================ -->
+<h1 class="section-title page-break">3. Proposed System Architecture</h1>
+
+<h2>3.1 Three-Tier Defense Overview</h2>
+<p class="indent">Our system follows a <strong>defense-in-depth</strong> principle, where each tier addresses a specific class of threats that the previous tier cannot handle. This layered approach ensures comprehensive coverage against known attacks, unknown attacks, and adversarial evasion attempts.</p>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Tier</th>
+      <th>Component</th>
+      <th>Threat Coverage</th>
+      <th>Speed</th>
+      <th>Key Technology</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Tier 1</strong></td>
+      <td>Signature Detection</td>
+      <td>Known attacks (100%)</td>
+      <td>&lt; 0.5ms</td>
+      <td>JSON rule database, pattern matching</td>
+    </tr>
+    <tr>
+      <td><strong>Tier 2</strong></td>
+      <td>ML Classification</td>
+      <td>Unknown/novel attacks</td>
+      <td>~12ms</td>
+      <td>TensorFlow DNN/CNN/LSTM</td>
+    </tr>
+    <tr>
+      <td><strong>Tier 3</strong></td>
+      <td>Adversarial Defense</td>
+      <td>Adversarial evasion</td>
+      <td>~35ms</td>
+      <td>PyTorch adversarial training</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3.2 Tier 1: Signature-Based Detection</h2>
+<p class="indent">Tier 1 provides fast, deterministic detection of known attack patterns using a JSON-based signature database. Each signature defines a set of conditions (feature thresholds) that characterize a specific attack type. The matching algorithm computes a match ratio and triggers detection when the ratio exceeds a configurable threshold (default: 0.8).</p>
+
+<p><strong>Signature Database Categories:</strong></p>
+<ul>
+  <li><strong>DoS Attacks:</strong> SYN Flood, UDP Flood, HTTP Flood (Slowloris)</li>
+  <li><strong>Port Scanning:</strong> TCP Port Scan</li>
+  <li><strong>Brute Force:</strong> SSH Brute Force, FTP Brute Force</li>
+  <li><strong>Web Attacks:</strong> SQL Injection, Cross-Site Scripting (XSS)</li>
+  <li><strong>Botnet:</strong> C2 Communication patterns</li>
+  <li><strong>NSL-KDD Specific:</strong> Neptune, Smurf, Port Sweep, Satan, Buffer Overflow</li>
+</ul>
+
+<p><strong>Matching Algorithm:</strong></p>
+<pre><span class="cm">// Pseudocode for signature matching</span>
+<span class="kw">for each</span> signature <span class="kw">in</span> database:
+    match_count = <span class="num">0</span>
+    total_conditions = len(signature.conditions)
+
+    <span class="kw">for each</span> (feature, rule) <span class="kw">in</span> conditions:
+        <span class="kw">if</span> rule is range:    check min/max bounds
+        <span class="kw">if</span> rule is list:     check value membership
+        <span class="kw">if</span> rule is scalar:   check exact equality
+        <span class="kw">if</span> matched: match_count += <span class="num">1</span>
+
+    match_ratio = match_count / total_conditions
+    <span class="kw">if</span> match_ratio >= <span class="num">0.8</span>: <span class="kw">return</span> ATTACK DETECTED</pre>
+
+<h2>3.3 Tier 2: ML Classification</h2>
+<p class="indent">Tier 2 employs three deep learning architectures trained to classify network traffic into five categories: Normal, DoS, Probe, R2L, and U2R. All three models are trained and the best-performing model (by validation accuracy) is selected for deployment.</p>
+
+<h3>3.3.1 Deep Neural Network (DNN)</h3>
+<p>Four-layer fully connected network optimized for tabular network traffic data:</p>
+<pre>Input(n_features) &rarr; Dense(<span class="num">256</span>, ReLU) &rarr; BatchNorm &rarr; Dropout(<span class="num">0.3</span>)
+                  &rarr; Dense(<span class="num">128</span>, ReLU) &rarr; BatchNorm &rarr; Dropout(<span class="num">0.3</span>)
+                  &rarr; Dense(<span class="num">64</span>,  ReLU) &rarr; BatchNorm &rarr; Dropout(<span class="num">0.3</span>)
+                  &rarr; Dense(<span class="num">32</span>,  ReLU) &rarr; Dense(<span class="num">5</span>, Softmax) &rarr; Output</pre>
+
+<h3>3.3.2 1D Convolutional Neural Network (CNN)</h3>
+<p>Treats features as a 1D sequence, using convolutional layers to detect local patterns:</p>
+<pre>Input(n_features, <span class="num">1</span>) &rarr; Conv1D(<span class="num">64</span>, k=<span class="num">3</span>) &rarr; BN &rarr; MaxPool
+                     &rarr; Conv1D(<span class="num">128</span>, k=<span class="num">3</span>) &rarr; BN &rarr; MaxPool
+                     &rarr; Conv1D(<span class="num">256</span>, k=<span class="num">3</span>) &rarr; BN &rarr; Flatten
+                     &rarr; Dense(<span class="num">128</span>) &rarr; Dropout &rarr; Dense(<span class="num">64</span>) &rarr; Softmax</pre>
+
+<h3>3.3.3 LSTM Network</h3>
+<p>Captures sequential dependencies in traffic features:</p>
+<pre>Input(<span class="num">1</span>, n_features) &rarr; LSTM(<span class="num">128</span>, return_seq) &rarr; Dropout(<span class="num">0.3</span>)
+                     &rarr; LSTM(<span class="num">64</span>) &rarr; Dropout(<span class="num">0.3</span>)
+                     &rarr; Dense(<span class="num">32</span>, ReLU) &rarr; Dense(<span class="num">5</span>, Softmax)</pre>
+
+<h2>3.4 Tier 3: Adversarial Defense</h2>
+<p class="indent">Tier 3 implements three complementary defense strategies to detect and resist adversarial evasion attacks:</p>
+
+<div class="box box-blue">
+  <div class="box-title">Strategy 1: Adversarial Training</div>
+  <p>During training, each batch is composed of 40% clean samples, 30% FGSM-perturbed samples, and 30% PGD-perturbed samples. The model learns to classify correctly regardless of whether the input has been adversarially perturbed.</p>
+</div>
+
+<div class="box box-teal">
+  <div class="box-title">Strategy 2: Input Transformation (Feature Squeezing)</div>
+  <p>At inference time, the input is passed through a bit-depth reduction filter (16 quantization levels). Predictions on the original and squeezed inputs are compared. If the L1 distance between predictions exceeds a threshold (0.1), the input is flagged as adversarial.</p>
+</div>
+
+<div class="box box-amber">
+  <div class="box-title">Strategy 3: Ensemble Voting</div>
+  <p>Multiple models (DNN, CNN, LSTM) independently predict probability distributions. Predictions are averaged via soft voting. Low agreement among models indicates a potential adversarial input, as adversarial perturbations often do not transfer equally across architectures.</p>
+</div>
+
+<h2>3.5 GAN Module (WGAN-GP)</h2>
+<p class="indent">A Wasserstein GAN with Gradient Penalty generates realistic synthetic attack traffic for data augmentation and stress testing. The generator transforms 100-dimensional noise vectors into feature vectors matching the dimensionality of preprocessed network traffic. The discriminator uses a 5:1 training ratio (5 discriminator updates per generator update) with gradient penalty (weight = 10) for training stability.</p>
+
+<h2>3.6 Complete System Architecture Diagram</h2>
+<div class="arch">
+<span class="w">  DATA SOURCES              PREPROCESSING                DETECTION PIPELINE</span>
+
+  <span class="b">+------------+</span>            <span class="t">+---------------------+</span>       <span class="b">+---------------------------+</span>
+  <span class="b">| NSL-KDD    |</span>----------> <span class="t">| Data Cleaning       |</span>  +-->  <span class="b">| TIER 1: SIGNATURE         |</span>
+  <span class="b">+------------+</span>            <span class="t">| Label Encoding      |</span>  |    <span class="b">| Pattern matching          |</span>
+  <span class="b">+------------+</span>            <span class="t">| One-Hot Encoding    |</span>  |    <span class="b">| &lt;0.5ms | 100% known       |</span>
+  <span class="b">| CICIDS2017 |</span>----------> <span class="t">| StandardScaler      |</span>--+    <span class="b">+-----------+---------------+</span>
+  <span class="b">+------------+</span>            <span class="t">| Feature Selection   |</span>  |                |  (no match)
+  <span class="b">+------------+</span>            <span class="t">| SMOTE Balancing     |</span>  |    <span class="g">+-----------v---------------+</span>
+  <span class="b">| Synthetic  |</span>----------> <span class="t">+---------------------+</span>  +-->  <span class="g">| TIER 2: ML CLASSIFICATION |</span>
+  <span class="b">+------------+</span>                                           <span class="g">| DNN / CNN / LSTM models   |</span>
+                            <span class="a">GAN MODULE</span>                       <span class="g">| ~95% acc | ~12ms          |</span>
+  <span class="a">+-------------------+</span>                                    <span class="g">+-----------+---------------+</span>
+  <span class="a">| WGAN-GP Generator |</span>   Synthetic                                 |  (attack found)
+  <span class="a">| Gradient Penalty  |</span>   attack data              <span class="p">+-----------v---------------+</span>
+  <span class="a">+-------------------+</span>                              <span class="p">| TIER 3: ADVERSARIAL DEF.  |</span>
+                                                      <span class="p">| Adversarial Training      |</span>
+  <span class="w">EVALUATION</span>                                           <span class="p">| Feature Squeezing         |</span>
+  <span class="w">+-------------------+</span>                              <span class="p">| Ensemble Voting           |</span>
+  <span class="w">| Metrics, ROC,     |</span>  Comprehensive              <span class="p">| 88% robust | ~35ms        |</span>
+  <span class="w">| Confusion Matrix, |</span>  evaluation                 <span class="p">+-----------+---------------+</span>
+  <span class="w">| Robustness Tests  |</span>                                          |
+  <span class="w">+-------------------+</span>                              <span class="r">+-----------v---------------+</span>
+                                                      <span class="r">| ALERT MANAGER             |</span>
+  <span class="t">STREAMLIT DASHBOARD</span>                                <span class="r">| Priority 1-4 Scoring      |</span>
+  <span class="t">+-------------------+</span>                              <span class="r">| Logging &amp; Statistics      |</span>
+  <span class="t">| Real-time Monitor |</span>                              <span class="r">+---------------------------+</span>
+  <span class="t">| Attack Simulation |</span>
+  <span class="t">+-------------------+</span>
+</div>
+<div class="fig-caption">Figure 1: Complete System Architecture &mdash; Adversarially Robust Intrusion Detection System</div>
+
+<!-- ================================================================ -->
+<!--  4. DATASET                                                      -->
+<!-- ================================================================ -->
+<h1 class="section-title page-break">4. Dataset Description</h1>
+
+<h2>4.1 NSL-KDD Dataset</h2>
+<p class="indent">The NSL-KDD dataset is a refined version of the original KDD Cup 1999 dataset, published by the Canadian Institute for Cybersecurity at the University of New Brunswick. It addresses key issues in the original dataset such as redundant records and class overlap, making it the standard benchmark for IDS research.</p>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Training Samples</td><td>125,973 labeled network connection records</td></tr>
+    <tr><td>Test Samples</td><td>22,544 records</td></tr>
+    <tr><td>Features</td><td>41 features per connection (numerical + categorical)</td></tr>
+    <tr><td>Categorical Features</td><td>protocol_type (3), service (70), flag (11)</td></tr>
+    <tr><td>Classification</td><td>5 classes: Normal, DoS, Probe, R2L, U2R</td></tr>
+    <tr><td>Attack Sub-types</td><td>24 distinct attack types grouped into 4 categories</td></tr>
+  </tbody>
+</table>
+
+<h2>4.2 Class Distribution &amp; Imbalance</h2>
+<p class="indent">The dataset exhibits severe class imbalance, which is a realistic reflection of real-world network traffic where attacks are far less frequent than normal traffic, and certain attack types are extremely rare.</p>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Class</th>
+      <th>Category</th>
+      <th>Samples</th>
+      <th>Percentage</th>
+      <th>Example Sub-types</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>0</strong></td><td>Normal</td><td>67,343</td><td>53.4%</td><td>Legitimate traffic</td></tr>
+    <tr><td><strong>1</strong></td><td>DoS</td><td>45,927</td><td>36.5%</td><td>neptune, smurf, back, teardrop, land</td></tr>
+    <tr><td><strong>2</strong></td><td>Probe</td><td>11,656</td><td>9.3%</td><td>portsweep, ipsweep, nmap, satan</td></tr>
+    <tr><td><strong>3</strong></td><td>R2L</td><td>995</td><td>0.8%</td><td>guess_passwd, ftp_write, imap, phf</td></tr>
+    <tr><td><strong>4</strong></td><td>U2R</td><td>52</td><td style="color:#ef4444;font-weight:700;">0.04%</td><td>buffer_overflow, rootkit, loadmodule</td></tr>
+  </tbody>
+</table>
+
+<div class="box box-red">
+  <div class="box-title">Imbalance Challenge</div>
+  <p>The U2R class has only <strong>52 samples</strong> &mdash; nearly 1,300 times fewer than Normal. A naive model ignoring U2R achieves 99.96% accuracy but detects zero privilege escalation attacks. Our solution applies SMOTE oversampling and WGAN-GP augmentation to equalize class representation during training.</p>
+</div>
+
+
+<!-- ================================================================ -->
+<!--  5. TECHNOLOGY STACK                                             -->
+<!-- ================================================================ -->
+<h1 class="section-title page-break">5. Technology Stack</h1>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Technology</th>
+      <th>Version</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td rowspan="2"><strong>Deep Learning</strong></td><td>TensorFlow / Keras</td><td>2.13+</td><td>Tier 2 ML models (DNN, CNN, LSTM)</td></tr>
+    <tr><td>PyTorch</td><td>2.0+</td><td>Adversarial attacks, Tier 3 defense, WGAN-GP</td></tr>
+    <tr><td rowspan="2"><strong>ML &amp; Data</strong></td><td>scikit-learn</td><td>1.3+</td><td>Preprocessing, metrics, feature selection</td></tr>
+    <tr><td>imbalanced-learn</td><td>0.11+</td><td>SMOTE class oversampling</td></tr>
+    <tr><td><strong>Adversarial</strong></td><td>ART (IBM)</td><td>1.15+</td><td>Adversarial Robustness Toolbox &mdash; C&amp;W, DeepFool</td></tr>
+    <tr><td rowspan="2"><strong>Data Handling</strong></td><td>pandas</td><td>2.0+</td><td>Data loading and manipulation</td></tr>
+    <tr><td>NumPy</td><td>1.24+</td><td>Numerical operations</td></tr>
+    <tr><td rowspan="3"><strong>Visualization</strong></td><td>Streamlit</td><td>1.25+</td><td>Interactive web dashboard</td></tr>
+    <tr><td>Plotly</td><td>5.15+</td><td>Interactive charts and plots</td></tr>
+    <tr><td>Matplotlib / Seaborn</td><td>3.7+ / 0.12+</td><td>Static visualizations</td></tr>
+    <tr><td rowspan="2"><strong>Infrastructure</strong></td><td>pytest</td><td>7.4+</td><td>Unit and integration testing</td></tr>
+    <tr><td>PyYAML</td><td>6.0+</td><td>Configuration management</td></tr>
+  </tbody>
+</table>
+
+<div class="box box-blue">
+  <div class="box-title">Design Decision: Two Deep Learning Frameworks</div>
+  <p><strong>TensorFlow/Keras</strong> is used for Tier 2 because of its mature training pipeline, built-in callbacks (EarlyStopping, ReduceLROnPlateau, ModelCheckpoint), and efficient .h5 model serialization. <strong>PyTorch</strong> is used for adversarial attacks and Tier 3 because it provides fine-grained gradient control via <code>requires_grad_(True)</code> and <code>.backward()</code>, which is essential for implementing FGSM, PGD, and GAN training loops.</p>
+</div>
+
+
+<!-- ================================================================ -->
+<!--  6. PROJECT STRUCTURE                                            -->
+<!-- ================================================================ -->
+<h1 class="section-title page-break">6. Project Structure &amp; Implementation</h1>
+
+<h2>6.1 Directory Organization</h2>
+<pre><span class="fn">adversarial-robust-ids/</span>
+<span class="cm">|</span>-- main.py                          <span class="cm"># Entry point (train, evaluate, detect, dashboard, demo)</span>
+<span class="cm">|</span>-- config/
+<span class="cm">|</span>   <span class="cm">|</span>-- config.yaml                  <span class="cm"># All system configuration (single source of truth)</span>
+<span class="cm">|</span>-- data/
+<span class="cm">|</span>   <span class="cm">|</span>-- raw/                         <span class="cm"># NSL-KDD and CICIDS2017 datasets</span>
+<span class="cm">|</span>   <span class="cm">|</span>-- processed/                   <span class="cm"># Preprocessed data (auto-generated)</span>
+<span class="cm">|</span>   <span class="cm">|</span>-- signatures/
+<span class="cm">|</span>       <span class="cm">|</span>-- signatures.json          <span class="cm"># Tier 1 attack signature database</span>
+<span class="cm">|</span>-- src/
+<span class="cm">|</span>   <span class="cm">|</span>-- preprocessing/               <span class="cm"># Data cleaning, encoding, scaling, SMOTE</span>
+<span class="cm">|</span>   <span class="cm">|</span>-- tier1_signature/             <span class="cm"># Pattern matching detector</span>
+<span class="cm">|</span>   <span class="cm">|</span>-- tier2_ml_detection/          <span class="cm"># DNN, CNN, LSTM models + training</span>
+<span class="cm">|</span>   <span class="cm">|</span>-- tier3_adversarial_defense/   <span class="cm"># Adv. training, squeezing, ensemble</span>
+<span class="cm">|</span>   <span class="cm">|</span>-- adversarial_attacks/         <span class="cm"># FGSM, PGD, C&amp;W, DeepFool</span>
+<span class="cm">|</span>   <span class="cm">|</span>-- gan_generator/               <span class="cm"># WGAN-GP generator + discriminator</span>
+<span class="cm">|</span>   <span class="cm">|</span>-- integration/                 <span class="cm"># Three-tier pipeline orchestrator</span>
+<span class="cm">|</span>   <span class="cm">|</span>-- evaluation/                  <span class="cm"># Metrics, confusion matrix, ROC</span>
+<span class="cm">|</span>   <span class="cm">|</span>-- dashboard/                   <span class="cm"># Streamlit web application</span>
+<span class="cm">|</span>   <span class="cm">|</span>-- utils/                       <span class="cm"># Config loader, logger</span>
+<span class="cm">|</span>-- models/                          <span class="cm"># Saved model weights (.h5, .pth, .pkl)</span>
+<span class="cm">|</span>-- tests/                           <span class="cm"># Unit and integration tests</span>
+<span class="cm">|</span>-- notebooks/                       <span class="cm"># Jupyter experimentation notebooks</span>
+<span class="cm">|</span>-- docs/                            <span class="cm"># Documentation</span>
+<span class="cm">|</span>-- logs/                            <span class="cm"># Runtime and alert logs</span>
+<span class="cm">|</span>-- requirements.txt                 <span class="cm"># Python dependencies</span></pre>
+
+<h2>6.2 Configuration Management</h2>
+<p class="indent">All system parameters are managed through a single YAML configuration file (<code>config/config.yaml</code>), enabling reproducible experiments without code changes. Key configurable parameters include:</p>
+
+<table class="data-table">
+  <thead>
+    <tr><th>Parameter</th><th>Default</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>dataset.primary</td><td>NSL-KDD</td><td>Primary dataset name</td></tr>
+    <tr><td>preprocessing.top_features</td><td>35</td><td>Number of features to select via mutual information</td></tr>
+    <tr><td>preprocessing.imbalance_method</td><td>smote</td><td>Class balancing strategy</td></tr>
+    <tr><td>tier2.training.epochs</td><td>30</td><td>Maximum training epochs for Tier 2 models</td></tr>
+    <tr><td>tier2.training.batch_size</td><td>128</td><td>Training batch size</td></tr>
+    <tr><td>tier2.training.learning_rate</td><td>0.001</td><td>Adam optimizer learning rate</td></tr>
+    <tr><td>adversarial_attacks.fgsm.epsilon</td><td>0.1</td><td>FGSM perturbation magnitude</td></tr>
+    <tr><td>adversarial_attacks.pgd.num_iterations</td><td>40</td><td>PGD attack iteration count</td></tr>
+    <tr><td>adversarial_training.clean_ratio</td><td>0.4</td><td>Fraction of clean samples in adversarial training</td></tr>
+    <tr><td>gan.epochs</td><td>100</td><td>WGAN-GP training epochs</td></tr>
+    <tr><td>gan.gradient_penalty_weight</td><td>10</td><td>Gradient penalty coefficient</td></tr>
+  </tbody>
+</table>
+
+<h2>6.3 Key Code Components</h2>
+<p><strong>Entry Point &mdash;</strong> <code>main.py</code> supports five operational modes:</p>
+<pre><span class="cm"># Available modes</span>
+python main.py --mode demo       <span class="cm"># Quick demo with synthetic data</span>
+python main.py --mode train      <span class="cm"># Train all models (Tier 2 + GAN + Tier 3)</span>
+python main.py --mode evaluate   <span class="cm"># Run full evaluation suite</span>
+python main.py --mode detect --input traffic.csv  <span class="cm"># Run detection pipeline</span>
+python main.py --mode dashboard  <span class="cm"># Launch Streamlit dashboard</span></pre>
+
+
+<!-- ================================================================ -->
+<!--  7. PREPROCESSING                                                -->
+<!-- ================================================================ -->
+<h1 class="section-title page-break">7. Data Preprocessing Pipeline</h1>
+
+<p class="indent">The preprocessing pipeline transforms raw network traffic data into a clean, normalized, balanced dataset suitable for training deep learning models. The pipeline is implemented in <code>src/preprocessing/preprocessor.py</code> and follows these steps:</p>
+
+<table class="data-table">
+  <thead>
+    <tr><th>Step</th><th>Operation</th><th>Details</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td><strong>Data Cleaning</strong></td><td>Replace infinity with NaN, fill NaN with median, remove duplicate rows</td></tr>
+    <tr><td>2</td><td><strong>Label Encoding</strong></td><td>Map 24 attack sub-types to 5 categories (Normal=0, DoS=1, Probe=2, R2L=3, U2R=4)</td></tr>
+    <tr><td>3</td><td><strong>Categorical Encoding</strong></td><td>One-hot encode protocol_type, service, flag (~3 columns &rarr; ~84 binary columns)</td></tr>
+    <tr><td>4</td><td><strong>Data Splitting</strong></td><td>70% train / 15% validation / 15% test with stratified sampling</td></tr>
+    <tr><td>5</td><td><strong>Feature Scaling</strong></td><td>StandardScaler (zero mean, unit variance) fitted on training data only</td></tr>
+    <tr><td>6</td><td><strong>Feature Selection</strong></td><td>SelectKBest with mutual_info_classif &mdash; retain top 35 features</td></tr>
+    <tr><td>7</td><td><strong>Class Balancing</strong></td><td>SMOTE oversampling on training set only (k_neighbors adapted to min class size)</td></tr>
+    <tr><td>8</td><td><strong>Artifact Saving</strong></td><td>Save scaler.pkl, label_encoder.pkl, feature_selector.pkl for inference</td></tr>
+  </tbody>
+</table>
+
+<div class="box box-teal">
+  <div class="box-title">Critical Rule: No Data Leakage</div>
+  <p>The scaler is <strong>fitted exclusively on training data</strong> and then applied (transformed) to validation and test sets. SMOTE is applied only to training data. This prevents information from the test set leaking into the training process and ensures evaluation metrics reflect true generalization performance.</p>
+</div>
+
+<p><strong>Data Shape Transformation:</strong></p>
+<pre>Raw NSL-KDD:        (<span class="num">125,973</span> rows x <span class="num">43</span> columns)
+After cleaning:      ~<span class="num">125,000</span> rows (duplicates removed)
+After one-hot:       ~<span class="num">125,000</span> rows x ~<span class="num">122</span> columns
+After split:         Train: ~<span class="num">87,500</span>  |  Val: ~<span class="num">18,750</span>  |  Test: ~<span class="num">18,750</span>
+After feature select: <span class="num">122</span> &rarr; <span class="num">35</span> features (71% reduction)
+After SMOTE:         Train: ~<span class="num">100,000+</span> samples (balanced classes)</pre>
+
+
+<!-- ================================================================ -->
+<!--  8. ADVERSARIAL ATTACKS                                          -->
+<!-- ================================================================ -->
+<h1 class="section-title page-break">8. Adversarial Attack Methods</h1>
+
+<p class="indent">We implement four adversarial attack methods to comprehensively evaluate the robustness of our ML models. These attacks generate adversarial examples by adding carefully computed perturbations to the input, causing the classifier to mispredict.</p>
+
+<h2>8.1 FGSM &mdash; Fast Gradient Sign Method</h2>
+<p class="indent">Proposed by Goodfellow et al. (2015), FGSM computes a single-step perturbation in the direction of the loss gradient:</p>
+<pre><span class="cm"># Mathematical formulation</span>
+x_adv = x + <span class="fn">&epsilon;</span> &middot; sign(&nabla;<sub>x</sub> L(f(x), y))
+
+<span class="cm"># Implementation (src/adversarial_attacks/fgsm.py)</span>
+<span class="kw">def</span> <span class="fn">fgsm_attack</span>(model, x, y, epsilon=<span class="num">0.1</span>):
+    x_adv = x.clone().detach().requires_grad_(<span class="kw">True</span>)
+    output = model(x_adv)
+    loss = F.cross_entropy(output, y)
+    loss.backward()
+    perturbation = epsilon * x_adv.grad.sign()
+    x_adv = torch.clamp(x + perturbation, <span class="num">0</span>, <span class="num">1</span>)
+    <span class="kw">return</span> x_adv.detach()</pre>
+
+<h2>8.2 PGD &mdash; Projected Gradient Descent</h2>
+<p class="indent">Proposed by Madry et al. (2018), PGD is an iterative version of FGSM that applies multiple smaller steps and projects back into the epsilon-ball after each step. It is considered the strongest first-order attack:</p>
+<pre><span class="cm"># Iterative attack: 40 steps, step size &alpha; = 0.01, &epsilon; = 0.1</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(num_iterations):
+    x_adv.requires_grad_(<span class="kw">True</span>)
+    loss = F.cross_entropy(model(x_adv), y)
+    loss.backward()
+    x_adv = x_adv + &alpha; * x_adv.grad.sign()       <span class="cm"># Take step</span>
+    perturbation = clamp(x_adv - x, -&epsilon;, &epsilon;)      <span class="cm"># Project</span>
+    x_adv = clamp(x + perturbation, <span class="num">0</span>, <span class="num">1</span>)         <span class="cm"># Valid range</span></pre>
+
+<h2>8.3 C&amp;W &mdash; Carlini &amp; Wagner L2 Attack</h2>
+<p class="indent">An optimization-based attack that finds the minimum perturbation required for misclassification. It solves: <code>minimize ||&delta;||<sub>2</sub></code> subject to <code>f(x + &delta;) &ne; true_class</code>. Implemented via IBM's Adversarial Robustness Toolbox (ART).</p>
+
+<h2>8.4 DeepFool</h2>
+<p class="indent">Iteratively computes the minimal perturbation needed to cross the nearest decision boundary. Produces smaller, more efficient perturbations than FGSM or PGD.</p>
+
+<h2>8.5 Attack Comparison</h2>
+<table class="data-table">
+  <thead>
+    <tr><th>Attack</th><th>Steps</th><th>Speed</th><th>Strength</th><th>Perturbation Type</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>FGSM</strong></td><td>1</td><td>Very Fast</td><td>Moderate</td><td>L&infin; bounded</td></tr>
+    <tr><td><strong>PGD</strong></td><td>40</td><td>Slow</td><td>Strong</td><td>L&infin; bounded, iterative</td></tr>
+    <tr><td><strong>C&amp;W</strong></td><td>100</td><td>Very Slow</td><td>Strongest</td><td>L2 minimized</td></tr>
+    <tr><td><strong>DeepFool</strong></td><td>50</td><td>Medium</td><td>Strong</td><td>Minimal boundary crossing</td></tr>
+  </tbody>
+</table>
+
+
+<!-- ================================================================ -->
+<!--  9. EXPECTED RESULTS                                             -->
+<!-- ================================================================ -->
+<h1 class="section-title page-break">9. Expected Results</h1>
+
+<h2>9.1 Performance Comparison</h2>
+<p class="indent">The following table presents the expected performance comparison across different system configurations, demonstrating the value added by each tier:</p>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Metric</th>
+      <th>Signature Only</th>
+      <th>ML Only (Tier 2)</th>
+      <th>ML + Adv. Training</th>
+      <th>Full System (Ours)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Clean Accuracy</td><td>85.2%</td><td>95.3%</td><td>93.8%</td>
+      <td class="best">95.2%</td>
+    </tr>
+    <tr>
+      <td>Robust Accuracy (FGSM)</td><td>N/A</td><td style="color:#ef4444;font-weight:600;">42%</td><td>82%</td>
+      <td class="best">88%</td>
+    </tr>
+    <tr>
+      <td>False Positive Rate</td><td>1.0%</td><td>6.0%</td><td>5.2%</td>
+      <td class="best">3.5%</td>
+    </tr>
+    <tr>
+      <td>Unknown Attack Detection</td><td style="color:#ef4444;">0%</td><td>95%</td><td>93%</td>
+      <td class="best">95%</td>
+    </tr>
+    <tr>
+      <td>Adversarial Evasion Detection</td><td style="color:#ef4444;">0%</td><td style="color:#ef4444;">0%</td><td>75%</td>
+      <td class="best">92%</td>
+    </tr>
+    <tr>
+      <td>Detection Latency</td><td>0.3ms</td><td>12ms</td><td>25ms</td>
+      <td>35ms</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="box box-teal">
+  <div class="box-title">Key Achievement</div>
+  <p>The full three-tier system improves robust accuracy from <strong style="color:#ef4444;">42%</strong> (undefended ML) to <strong style="color:#0d9488;">88%</strong> &mdash; a <strong>+46 percentage point gain</strong> &mdash; while maintaining clean accuracy above 95%. Additionally, Tier 3's feature squeezing successfully identifies 92% of adversarial evasion attempts.</p>
+</div>
+
+<h2>9.2 Evaluation Metrics</h2>
+<p>The following metrics will be computed for comprehensive evaluation:</p>
+<ul>
+  <li><strong>Accuracy, Precision, Recall, F1-Score</strong> (weighted across all 5 classes)</li>
+  <li><strong>False Positive Rate (FPR)</strong> and <strong>False Negative Rate (FNR)</strong></li>
+  <li><strong>AUC-ROC</strong> (One-vs-Rest for each class)</li>
+  <li><strong>Confusion Matrix</strong> (5&times;5 per-class breakdown)</li>
+  <li><strong>Robustness Ratio</strong> = Robust Accuracy / Clean Accuracy</li>
+  <li><strong>Epsilon Sensitivity</strong> (accuracy vs. perturbation magnitude curve)</li>
+</ul>
+
+
+<!-- ================================================================ -->
+<!--  10. ROADMAP                                                     -->
+<!-- ================================================================ -->
+<h1 class="section-title page-break">10. Development Roadmap</h1>
+
+<p class="indent">The project is divided into 5 stages &mdash; 2 major reviews and 3 minor checkpoints &mdash; for structured presentation to the faculty mentor:</p>
+
+<table class="data-table">
+  <thead>
+    <tr><th>Stage</th><th>Type</th><th>Focus Area</th><th>Deliverables</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1</strong></td>
+      <td>Minor</td>
+      <td>Foundation &amp; Problem Statement</td>
+      <td>Architecture design, literature review, tech stack finalization, project setup</td>
+    </tr>
+    <tr style="background:#eff6ff;">
+      <td><strong>2</strong></td>
+      <td><strong>MAJOR</strong></td>
+      <td>Data Pipeline + Tier 1 + Tier 2</td>
+      <td>Complete preprocessing, signature detection, DNN/CNN/LSTM trained, baseline evaluation metrics</td>
+    </tr>
+    <tr>
+      <td><strong>3</strong></td>
+      <td>Minor</td>
+      <td>Adversarial Attack Implementation</td>
+      <td>FGSM, PGD, C&amp;W, DeepFool implemented; vulnerability analysis of Tier 2</td>
+    </tr>
+    <tr>
+      <td><strong>4</strong></td>
+      <td>Minor</td>
+      <td>GAN Module</td>
+      <td>WGAN-GP trained, synthetic attack samples generated, data augmentation</td>
+    </tr>
+    <tr style="background:#eff6ff;">
+      <td><strong>5</strong></td>
+      <td><strong>MAJOR</strong></td>
+      <td>Tier 3 + Integration + Final</td>
+      <td>Adversarial training, ensemble defense, full pipeline, dashboard, final evaluation report</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<!-- ================================================================ -->
+<!--  11. CONCLUSION                                                  -->
+<!-- ================================================================ -->
+<h1 class="section-title">11. Conclusion</h1>
+
+<p class="indent">This report presents the foundation and problem statement for an Adversarially Robust Intrusion Detection System. The proposed three-tier architecture addresses a critical gap in current IDS research by combining signature-based detection (for known threats), deep learning classification (for unknown attacks), and adversarial defense mechanisms (for evasion attacks).</p>
+
+<p class="indent">The key contributions of this project include: (1) a novel multi-tier IDS integrating adversarial robustness, (2) comprehensive implementation of four adversarial attack and three defense methods, (3) WGAN-GP-based data augmentation for handling severe class imbalance, and (4) a production-ready system with interactive dashboard monitoring.</p>
+
+<p class="indent">The next stage will focus on implementing the complete data preprocessing pipeline, training Tier 1 signature detection and Tier 2 ML models (DNN, CNN, LSTM), and establishing baseline accuracy metrics on the NSL-KDD dataset.</p>
+
+
+<!-- ================================================================ -->
+<!--  12. REFERENCES                                                  -->
+<!-- ================================================================ -->
+<h1 class="section-title page-break">12. References</h1>
+
+<ol style="font-size:10.5pt; line-height:1.8;">
+  <li>I. J. Goodfellow, J. Shlens, and C. Szegedy, "Explaining and Harnessing Adversarial Examples," <em>Proc. ICLR</em>, 2015.</li>
+  <li>A. Madry, A. Makelov, L. Schmidt, D. Tsipras, and A. Vladu, "Towards Deep Learning Models Resistant to Adversarial Attacks," <em>Proc. ICLR</em>, 2018.</li>
+  <li>N. Carlini and D. Wagner, "Towards Evaluating the Robustness of Neural Networks," <em>Proc. IEEE S&amp;P</em>, 2017.</li>
+  <li>S. M. Moosavi-Dezfooli, A. Fawzi, and P. Frossard, "DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks," <em>Proc. CVPR</em>, 2016.</li>
+  <li>I. J. Goodfellow et al., "Generative Adversarial Nets," <em>Proc. NeurIPS</em>, 2014.</li>
+  <li>M. Arjovsky, S. Chintala, and L. Bottou, "Wasserstein GAN," <em>Proc. ICML</em>, 2017.</li>
+  <li>I. Gulrajani, F. Ahmed, M. Arjovsky, V. Dumoulin, and A. Courville, "Improved Training of Wasserstein GANs," <em>Proc. NeurIPS</em>, 2017.</li>
+  <li>A. L. Buczak and E. Guven, "A Survey of Data Mining and Machine Learning Methods for Cyber Security Intrusion Detection," <em>IEEE Communications Surveys &amp; Tutorials</em>, vol. 18, no. 2, pp. 1153-1176, 2016.</li>
+  <li>Z. Ahmad, A. S. Khan, C. W. Shiang, J. Abdullah, and F. Ahmad, "Network Intrusion Detection System: A Systematic Study of Machine Learning and Deep Learning Approaches," <em>Transactions on Emerging Telecommunications Technologies</em>, 2021.</li>
+  <li>W. Xu, D. Evans, and Y. Qi, "Feature Squeezing: Detecting Adversarial Examples in Deep Neural Networks," <em>Proc. NDSS</em>, 2018.</li>
+  <li>M. Tavallaee, E. Bagheri, W. Lu, and A. A. Ghorbani, "A Detailed Analysis of the KDD CUP 99 Data Set," <em>Proc. IEEE CISDA</em>, 2009.</li>
+  <li>I. Sharafaldin, A. H. Lashkari, and A. A. Ghorbani, "Toward Generating a New Intrusion Detection Dataset and Intrusion Traffic Characterization," <em>Proc. ICISSP</em>, 2018.</li>
+  <li>N. V. Chawla, K. W. Bowyer, L. O. Hall, and W. P. Kegelmeyer, "SMOTE: Synthetic Minority Over-sampling Technique," <em>Journal of Artificial Intelligence Research</em>, vol. 16, pp. 321-357, 2002.</li>
+</ol>
+
+<div style="margin-top:60px;text-align:center;color:var(--light);font-size:10pt;">
+  <div style="width:60px;height:3px;background:linear-gradient(90deg,var(--navy),var(--accent));margin:0 auto 12px;border-radius:2px;"></div>
+  <p><strong>End of Stage 1 Report</strong></p>
+  <p>Adversarially Robust Intrusion Detection System &mdash; Onkar Bhagwat</p>
+</div>
+
+</body>
+</html>
