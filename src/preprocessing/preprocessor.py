@@ -168,7 +168,7 @@ class DataPreprocessor:
         label_col = 'label_binary' if label_type == 'binary' else 'label_multiclass'
 
         # 4. Separate features and labels before encoding categoricals
-        exclude_cols = ['label', 'attack_category', 'split', 'label_binary', 'label_multiclass']
+        exclude_cols = ['label', 'Label', 'attack_category', 'split', 'label_binary', 'label_multiclass']
         feature_df = df.drop(columns=[c for c in exclude_cols if c in df.columns])
         y = df[label_col].values
 

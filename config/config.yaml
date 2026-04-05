@@ -5,9 +5,9 @@ system:
   log_file: "logs/ids.log"
 
 dataset:
-  primary: "NSL-KDD"
+  # Options: "NSL-KDD", "CICIDS2017", "combined"
+  primary: "CICIDS2017"
   path: "data/raw/NSL-KDD"
-  secondary: "CICIDS2017"
   secondary_path: "data/raw/CICIDS2017"
   train_split: 0.70
   val_split: 0.15

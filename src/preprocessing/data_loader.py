@@ -39,6 +39,36 @@ NSL_KDD_ATTACK_MAP = {
     'httptunnel': 'U2R', 'ps': 'U2R', 'sqlattack': 'U2R', 'xterm': 'U2R',
 }
 
+# CICIDS2017 label to category mapping
+CICIDS_ATTACK_MAP = {
+    'BENIGN': 'Normal',
+    # DoS attacks
+    'DDoS': 'DoS',
+    'DoS Hulk': 'DoS',
+    'DoS GoldenEye': 'DoS',
+    'DoS slowloris': 'DoS',
+    'DoS Slowhttptest': 'DoS',
+    'Heartbleed': 'DoS',
+    # Probe attacks
+    'PortScan': 'Probe',
+    # R2L attacks (remote access / brute force)
+    'FTP-Patator': 'R2L',
+    'SSH-Patator': 'R2L',
+    'Bot': 'R2L',
+    'Web Attack \ufffd Brute Force': 'R2L',
+    'Web Attack \ufffd XSS': 'R2L',
+    'Web Attack \ufffd Sql Injection': 'R2L',
+    # Handle common encoding variants
+    'Web Attack - Brute Force': 'R2L',
+    'Web Attack - XSS': 'R2L',
+    'Web Attack - Sql Injection': 'R2L',
+    'Web Attack – Brute Force': 'R2L',
+    'Web Attack – XSS': 'R2L',
+    'Web Attack – Sql Injection': 'R2L',
+    # U2R attacks (privilege escalation)
+    'Infiltration': 'U2R',
+}
+
 # Category to numeric mapping
 CATEGORY_MAP = {
     'Normal': 0, 'DoS': 1, 'Probe': 2, 'R2L': 3, 'U2R': 4
@@ -46,7 +76,7 @@ CATEGORY_MAP = {
 
 
 class DataLoader:
-    """Load datasets for the IDS system. Supports NSL-KDD, CICIDS2017, and synthetic data."""
+    """Load datasets for the IDS system. Supports NSL-KDD, CICIDS2017, combined, and synthetic data."""
 
     def load(self, config):
         """Load dataset based on config."""
@@ -57,6 +87,8 @@ class DataLoader:
         elif dataset_name == 'CICIDS2017':
             path = resolve_path(config['dataset']['secondary_path'])
             return self.load_cicids2017(path)
+        elif dataset_name == 'combined':
+            return self.load_combined(config)
         else:
             raise ValueError(f"Unknown dataset: {dataset_name}")
 
@@ -101,7 +133,9 @@ class DataLoader:
         """
         Load CICIDS2017 dataset from CSV files.
 
-        Expects CSV files in data_dir.
+        Expects CSV files in data_dir. Maps CICIDS2017 labels to the
+        standard 5-category scheme (Normal, DoS, Probe, R2L, U2R).
+        Renames columns to match NSL-KDD style for pipeline compatibility.
         """
         csv_files = glob.glob(os.path.join(data_dir, '*.csv'))
         if not csv_files:
@@ -112,16 +146,75 @@ class DataLoader:
 
         dfs = []
         for f in csv_files:
-            df = pd.read_csv(f)
-            dfs.append(df)
+            try:
+                chunk = pd.read_csv(f, encoding='utf-8', on_bad_lines='skip')
+                dfs.append(chunk)
+            except Exception as e:
+                print(f"Warning: Could not read {os.path.basename(f)}: {e}")
 
         df = pd.concat(dfs, ignore_index=True)
         df.columns = df.columns.str.strip()
 
-        # Map label to attack_category
-        df['attack_category'] = df['Label'].apply(
-            lambda x: 'Normal' if x == 'BENIGN' else x
-        )
+        # Map CICIDS2017 labels to 5 standard categories
+        df['attack_category'] = df['Label'].map(CICIDS_ATTACK_MAP)
+
+        # Handle any unmapped labels — treat as attack (DoS fallback)
+        unmapped = df['attack_category'].isna()
+        if unmapped.any():
+            unmapped_labels = df.loc[unmapped, 'Label'].unique()
+            print(f"Warning: Unmapped CICIDS2017 labels mapped to 'DoS': {unmapped_labels}")
+            df.loc[unmapped, 'attack_category'] = 'DoS'
+
+        # Rename 'Label' to 'label' for consistency with NSL-KDD pipeline
+        df.rename(columns={'Label': 'label'}, inplace=True)
+
+        return df
+
+    def load_combined(self, config):
+        """
+        Load both NSL-KDD and CICIDS2017, normalize columns, and combine.
+
+        Both datasets are mapped to the same 5 categories and share only
+        numeric features (common columns are kept, dataset-specific ones
+        are filled with 0).
+        """
+        nsl_path = resolve_path(config['dataset'].get('path', 'data/raw/NSL-KDD'))
+        cicids_path = resolve_path(config['dataset'].get('secondary_path', 'data/raw/CICIDS2017'))
+
+        # Load each dataset independently
+        df_nsl = self.load_nsl_kdd(nsl_path)
+        df_cicids = self.load_cicids2017(cicids_path)
+
+        # Tag source dataset
+        df_nsl['_source'] = 'NSL-KDD'
+        df_cicids['_source'] = 'CICIDS2017'
+
+        # Keep only numeric columns + label + attack_category + _source
+        meta_cols = ['label', 'attack_category', '_source']
+
+        nsl_numeric = df_nsl.select_dtypes(include=[np.number]).columns.tolist()
+        cicids_numeric = df_cicids.select_dtypes(include=[np.number]).columns.tolist()
+
+        # Keep all numeric columns from both; missing ones will be filled with 0
+        all_numeric = sorted(set(nsl_numeric + cicids_numeric))
+
+        # Add missing columns with 0
+        for col in all_numeric:
+            if col not in df_nsl.columns:
+                df_nsl[col] = 0.0
+            if col not in df_cicids.columns:
+                df_cicids[col] = 0.0
+
+        # Select columns in same order
+        df_nsl = df_nsl[all_numeric + meta_cols]
+        df_cicids = df_cicids[all_numeric + meta_cols]
+
+        df = pd.concat([df_nsl, df_cicids], ignore_index=True)
+
+        # Drop _source (used only for tagging during concat)
+        df.drop(columns=['_source'], inplace=True)
+
+        print(f"Combined dataset: NSL-KDD ({len(df_nsl)}) + CICIDS2017 ({len(df_cicids)}) = {len(df)} samples")
 
         return df
 
